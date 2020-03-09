@@ -1,6 +1,14 @@
 # Deep RL in TensorFlow2
 
-## Contents
+## Algorithms
+### DQN
+### REINFORCE
+### A2C
+### A3C
+### DDPG
+### TRPO
+### PPO
+### SAC
 
 ## Results
 
