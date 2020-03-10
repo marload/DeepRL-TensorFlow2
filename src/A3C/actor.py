@@ -11,14 +11,17 @@ class Actor:
         action_dim,
         action_bound,
         std_bound,
-        learning_rate
+        learning_rate=None,
+        entropy_beta=None
     ):
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.action_bound = action_bound
         self.std_bound = std_bound
 
-        self.optimizer = tf.keras.optimizers.Adam(learning_rate)
+        if not (learning_rate == None and entropy_beta == None):
+            self.ENTROPY_BETA = entropy_beta
+            self.optimizer = tf.keras.optimizers.Adam(learning_rate)
         self.model = self.create_model()
 
     def create_model(self):
@@ -32,12 +35,16 @@ class Actor:
         return tf.keras.models.Model(state_input, output)
 
     def get_action(self, state):
-        state = np.reshape(state, [1, self.state_dim])
-        mu, std = self.model.predict(state)
+        state = np.reshape(state, [1, -1])
+        mu, std = self.model(state)
         mu, std = mu[0], std[0]
         std = np.clip(std, self.std_bound[0], self.std_bound[1])
         action = np.random.normal(mu, std, size=self.action_dim)
         return action
+
+    def entropy(self, std):
+        std = np.clip(std, self.std_bound[0], self.std_bound[1])
+        return 0.5 * (tf.math.log(2 * np.pi * std ** 2) + 1.0)
 
     def log_pdf(self, mu, std, action):
         std = tf.clip_by_value(std, self.std_bound[0], self.std_bound[1])
@@ -48,7 +55,8 @@ class Actor:
 
     def loss(self, mu, std, actions, advantages):
         log_policy_pdf = self.log_pdf(mu, std, actions)
-        return tf.reduce_sum(-log_policy_pdf * advantages)
+        entropy = self.entropy(std) * self.ENTROPY_BETA
+        return tf.reduce_sum(-log_policy_pdf * advantages - entropy)
 
     def train(self, states, actions, advantages):
         with tf.GradientTape() as tape:

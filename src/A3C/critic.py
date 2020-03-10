@@ -5,11 +5,12 @@ import numpy as np
 
 
 class Critic:
-    def __init__(self, state_dim, learning_rate):
+    def __init__(self, state_dim, learning_rate=None):
         self.state_dim = state_dim
 
-        self.loss = tf.keras.losses.MeanSquaredError()
-        self.optimizer = tf.keras.optimizers.Adam(learning_rate)
+        if not learning_rate == None:
+            self.loss = tf.keras.losses.MeanSquaredError()
+            self.optimizer = tf.keras.optimizers.Adam(learning_rate)
         self.model = self.create_model()
 
     def create_model(self):
