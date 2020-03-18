@@ -1,6 +1,6 @@
 import wandb
 import tensorflow as tf
-from tensorflow.keras.layers import Input, Dense
+from tensorflow.keras.layers import Input, Dense, Lambda
 
 import gym
 import argparse
@@ -8,7 +8,7 @@ import numpy as np
 
 tf.keras.backend.set_floatx('float64')
 
-wandb.init(name='PPO', project="deep-rl-tf2")
+# wandb.init(name='PPO', project="deep-rl-tf2")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', type=float, default=0.99)
@@ -23,11 +23,29 @@ args = parser.parse_args()
 
 
 class Actor:
-    def __init__(self, state_dim, action_dim):
+    def __init__(self, state_dim, action_dim, action_bound, std_bound):
         self.state_dim = state_dim
         self.action_dim = action_dim
+        self.action_bound = action_bound
+        self.std_bound = std_bound
         self.model = self.create_model()
         self.opt = tf.keras.optimizers.Adam(args.actor_lr)
+
+    def get_action(self, state):
+        state = np.reshape(state, [1, self.state_dim])
+        mu, std = self.model.predict(state)
+        action = np.random.normal(mu[0], std[0], size=self.action_dim)
+        action = np.clip(action, -self.action_bound, self.action_bound)
+        log_policy = self.log_pdf(mu, std, action)
+
+        return log_policy, action
+
+    def log_pdf(self, mu, std, action):
+        std = tf.clip_by_value(std, self.std_bound[0], self.std_bound[1])
+        var = std ** 2
+        log_policy_pdf = -0.5 * (action - mu) ** 2 / \
+            var - 0.5 * tf.math.log(var * 2 * np.pi)
+        return tf.reduce_sum(log_policy_pdf, 1, keepdims=True)
 
     def create_model(self):
         state_input = Input((self.state_dim,))
@@ -37,25 +55,19 @@ class Actor:
         std_output = Dense(self.action_dim, activation='softplus')(dense_1)
         return tf.keras.models.Model(state_input, [mu_output, std_output])
 
-    def compute_loss(self, old_policy, new_policy, actions, gaes):
-        old_log_p = tf.math.log(
-            tf.reduce_sum(old_policy * actions))
-        log_p = tf.math.log(tf.reduce_sum(
-            new_policy * actions))
-        ratio = tf.math.exp(log_p - old_log_p)
+    def compute_loss(self, log_old_policy, log_new_policy, actions, gaes):
+        ratio = tf.exp(log_new_policy - tf.stop_gradient(log_old_policy))
         clipped_ratio = tf.clip_by_value(
-            ratio, 1 - args.clip_ratio, 1 + args.clip_ratio)
+            ratio, 1.0-args.clip_ratio, 1.0+args.clip_ratio)
         surrogate = -tf.minimum(ratio * gaes, clipped_ratio * gaes)
         return tf.reduce_mean(surrogate)
 
-    def train(self, old_policy, states, actions, gaes):
-        actions = tf.one_hot(actions, self.action_dim)
-        actions = tf.reshape(actions, [-1, self.action_dim])
-        actions = tf.cast(actions, tf.float64)
-
+    def train(self, log_old_policy, states, actions, gaes):
         with tf.GradientTape() as tape:
-            logits = self.model(states, training=True)
-            loss = self.compute_loss(old_policy, logits, actions, gaes)
+            mu, std = self.model(states, training=True)
+            log_new_policy = self.log_pdf(mu, std, actions)
+            loss = self.compute_loss(
+                log_old_policy, log_new_policy, actions, gaes)
         grads = tape.gradient(loss, self.model.trainable_variables)
         self.opt.apply_gradients(zip(grads, self.model.trainable_variables))
         return loss
@@ -92,11 +104,14 @@ class Agent:
     def __init__(self, env):
         self.env = env
         self.state_dim = self.env.observation_space.shape[0]
-        self.action_dim = self.env.action_space.n
+        self.action_dim = self.env.action_space.shape[0]
+        self.action_bound = self.env.action_space.high[0]
+        self.std_bound = [1e-2, 1.0]
 
         self.actor_opt = tf.keras.optimizers.Adam(args.actor_lr)
         self.critic_opt = tf.keras.optimizers.Adam(args.critic_lr)
-        self.actor = Actor(self.state_dim, self.action_dim)
+        self.actor = Actor(self.state_dim, self.action_dim,
+                           self.action_bound, self.std_bound)
         self.critic = Critic(self.state_dim)
 
     def gae_target(self, rewards, v_values, next_v_value, done):
@@ -135,9 +150,7 @@ class Agent:
 
             while not done:
                 # self.env.render()
-                probs = self.actor.model.predict(
-                    np.reshape(state, [1, self.state_dim]))
-                action = np.random.choice(self.action_dim, p=probs[0])
+                log_old_policy, action = self.actor.get_action(state)
 
                 next_state, reward, done, _ = self.env.step(action)
 
@@ -145,11 +158,12 @@ class Agent:
                 action = np.reshape(action, [1, 1])
                 next_state = np.reshape(next_state, [1, self.state_dim])
                 reward = np.reshape(reward, [1, 1])
+                log_old_policy = np.reshape(log_old_policy, [1, 1])
 
                 state_batch.append(state)
                 action_batch.append(action)
                 reward_batch.append(reward * 0.01)
-                old_policy_batch.append(probs)
+                old_policy_batch.append(log_old_policy)
 
                 if len(state_batch) >= args.update_interval or done:
                     states = self.list_to_batch(state_batch)
@@ -177,11 +191,11 @@ class Agent:
                 state = next_state[0]
 
             print('EP{} EpisodeReward={}'.format(ep, episode_reward))
-            wandb.log({'Reward': episode_reward})
+            # wandb.log({'Reward': episode_reward})
 
 
 def main():
-    env_name = 'CartPole-v1'
+    env_name = 'Pendulum-v0'
     env = gym.make(env_name)
     agent = Agent(env)
     agent.train()
