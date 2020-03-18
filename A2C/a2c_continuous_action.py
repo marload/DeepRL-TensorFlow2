@@ -144,7 +144,7 @@ class Agent:
                 next_state = np.reshape(next_state, [1, self.state_dim])
                 reward = np.reshape(reward, [1, 1])
 
-                td_target = self.td_target(reward * 0.01, next_state, done)
+                td_target = self.td_target((reward+8)/8, next_state, done)
                 advantage = self.advatnage(
                     td_target, self.critic.model.predict(state))
 

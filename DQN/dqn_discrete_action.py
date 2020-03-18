@@ -96,13 +96,14 @@ class Agent:
                 self.state_dim * args.time_steps))
             states = states.reshape((1, self.state_dim * args.time_steps))
             target = self.t_model.predict(states)[0]
+            train_reward = reward * 0.01
             if done:
-                target[action] = reward
+                target[action] = train_reward
             else:
                 next_states = next_states.reshape(
                     (1, self.state_dim * args.time_steps))
                 next_q_value = max(self.t_model.predict(next_states)[0])
-                target[action] = reward + next_q_value * args.gamma
+                target[action] = train_reward + next_q_value * args.gamma
             batch_target.append(target)
         self.train_step(np.array(batch_states), np.array(batch_target))
 

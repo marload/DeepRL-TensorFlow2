@@ -165,7 +165,7 @@ class Agent:
 
                 state_batch.append(state)
                 action_batch.append(action)
-                reward_batch.append(reward * 0.01)
+                reward_batch.append((reward+8)/8)
                 old_policy_batch.append(log_old_policy)
 
                 if len(state_batch) >= args.update_interval or done:
