@@ -8,7 +8,7 @@ This repository contains code and performance comparison metrics that implement 
 ## Algorithms
 |    Name    |               Discrete               |               Continuous                |
 | :--------: | :----------------------------------: | :-------------------------------------: |
-|    DQN     |             Comming Soon             |              NOT SUPPORTED              |
+|    DQN     | [Code](./DQN/dqn_discrete_action.py) |              NOT SUPPORTED              |
 |    DRQN    |             Comming Soon             |              NOT SUPPORTED              |
 | DuelingDQN |             Comming Soon             |              NOT SUPPORTED              |
 | DoubleDQN  |             Comming Soon             |              NOT SUPPORTED              |
@@ -16,7 +16,7 @@ This repository contains code and performance comparison metrics that implement 
 | REINFORCE  |             Comming Soon             |              Comming Soon               |
 |    A2C     | [Code](./A2C/a2c_discrete_action.py) | [Code](./A2C/a2c_continuous_action.py)  |
 |    A3C     | [Code](./A3C/a3c_discrete_action.py) | [Code](./A3C/a3c_continuous_action.py)  |
-|    PPO     | [Code](./ppo/ppo_discrete_action.py) | [Code](./ppo/ppo_continuouts_action.py) |
+|    PPO     | [Code](./PPO/ppo_discrete_action.py) | [Code](./PPO/ppo_continuouts_action.py) |
 |    TRPO    |             Comming Soon             |              Comming Soon               |
 |   ACKTR    |             Comming Soon             |              Comming Soon               |
 |    ACER    |             Comming Soon             |              Comming Soon               |
@@ -45,3 +45,4 @@ This repository contains code and performance comparison metrics that implement 
 - https://spinningup.openai.com/en/latest/spinningup/keypapers.html
 - https://github.com/seungeunrho/minimalRL
 - https://github.com/openai/baselines
+- https://github.com/anita-hu/TF2-RL

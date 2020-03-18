@@ -220,7 +220,7 @@ class WorkerAgent(Thread):
                 state = next_state[0]
 
             print('EP{} EpisodeReward={}'.format(CUR_EPISODE, episode_reward))
-            wandb.log({'Rewardls': episode_reward})
+            wandb.log({'Reward': episode_reward})
             CUR_EPISODE += 1
 
     def run(self):
