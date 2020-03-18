@@ -30,6 +30,7 @@ class Actor:
         return tf.keras.Sequential([
             Input((self.state_dim,)),
             Dense(128, activation='relu'),
+            Dense(128, activation='relu'),
             Dense(self.action_dim, activation='softmax')
         ])
 
@@ -60,6 +61,7 @@ class Critic:
     def create_model(self):
         return tf.keras.Sequential([
             Input((self.state_dim,)),
+            Dense(128, activation='relu'),
             Dense(128, activation='relu'),
             Dense(1, activation='linear')
         ])

@@ -31,9 +31,10 @@ class Actor:
     def create_model(self):
         state_input = Input((self.state_dim,))
         dense_1 = Dense(128, activation='relu')(state_input)
-        out_mu = Dense(self.action_dim, activation='tanh')(dense_1)
+        dense_2 = Dense(128, activation='relu')(dense_1)
+        out_mu = Dense(self.action_dim, activation='tanh')(dense_2)
         mu_output = Lambda(lambda x: x * self.action_bound)(out_mu)
-        std_output = Dense(self.action_dim, activation='softplus')(dense_1)
+        std_output = Dense(self.action_dim, activation='softplus')(dense_2)
         return tf.keras.models.Model(state_input, [mu_output, std_output])
 
     def get_action(self, state):
@@ -72,6 +73,7 @@ class Critic:
     def create_model(self):
         return tf.keras.Sequential([
             Input((self.state_dim,)),
+            Dense(128, activation='relu'),
             Dense(128, activation='relu'),
             Dense(1, activation='linear')
         ])
@@ -133,6 +135,7 @@ class Agent:
             while not done:
                 # self.env.render()
                 action = self.actor.get_action(state)
+                action = np.clip(action, -self.action_bound, self.action_bound)
 
                 next_state, reward, done, _ = self.env.step(action)
 
