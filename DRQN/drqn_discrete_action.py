@@ -131,7 +131,7 @@ class Agent:
 
 
 def main():
-    env = gym.make('CartPole-v0')
+    env = gym.make('CartPole-v1')
     agent = Agent(env)
     agent.train(max_episodes=1000)
 
