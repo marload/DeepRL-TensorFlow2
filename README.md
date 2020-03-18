@@ -1,28 +1,28 @@
 # Deep RL in TensorFlow2
 This repository contains code and performance comparison metrics that implement popular Deep Reinforcement Learning algorithms in TensorFlow2.
 
-|                    Discrete                    |  Continuous  |
-| :--------------------------------------------: | :----------: |
-| ![discrete](./assets/discrete_reward_plot.png) | Comming Soon |
+|     ENV     |                    Discrete                    |
+| :---------: | :--------------------------------------------: |
+| CartPole-v1 | ![discrete](./assets/discrete_reward_plot.png) |
 
 ## Algorithms
-|    Name    |               Discrete               |               Continuous                |
-| :--------: | :----------------------------------: | :-------------------------------------: |
-|    DQN     | [Code](./DQN/dqn_discrete_action.py) |              NOT SUPPORTED              |
-|    DRQN    |             Comming Soon             |              NOT SUPPORTED              |
-| DuelingDQN |             Comming Soon             |              NOT SUPPORTED              |
-| DoubleDQN  |             Comming Soon             |              NOT SUPPORTED              |
-| RainbowDQN |             Comming Soon             |              NOT SUPPORTED              |
-| REINFORCE  |             Comming Soon             |              Comming Soon               |
-|    A2C     | [Code](./A2C/a2c_discrete_action.py) | [Code](./A2C/a2c_continuous_action.py)  |
-|    A3C     | [Code](./A3C/a3c_discrete_action.py) | [Code](./A3C/a3c_continuous_action.py)  |
-|    PPO     | [Code](./PPO/ppo_discrete_action.py) | [Code](./PPO/ppo_continuouts_action.py) |
-|    TRPO    |             Comming Soon             |              Comming Soon               |
-|   ACKTR    |             Comming Soon             |              Comming Soon               |
-|    ACER    |             Comming Soon             |              Comming Soon               |
-|    SAC     |             Comming Soon             |              Comming Soon               |
-|    DPG     |            NOT SUPPORTED             |              Comming Soon               |
-|    TD3     |            NOT SUPPORTED             |              Comming Soon               |
+|    Name    |     Method      |             Discrete Action              |             Continuous  Action              |
+| :--------: | :-------------: | :--------------------------------------: | :-----------------------------------------: |
+|    DQN     | TD / Off-Policy | [Possible](./DQN/dqn_discrete_action.py) |                 Impossible                  |
+|    DRQN    | TD / Off-Policy |                 Possible                 |                 Impossible                  |
+| DuelingDQN | TD / Off-Policy |                 Possible                 |                 Impossible                  |
+| DoubleDQN  | TD / Off-Policy |                 Possible                 |                 Impossible                  |
+| RainbowDQN | TD / Off-Policy |                 Possible                 |                 Impossible                  |
+| REINFORCE  | MC / On-Policy  |                 Possible                 |                  Possible                   |
+|    A2C     | TD / On-Policy  | [Possible](./A2C/a2c_discrete_action.py) | [Possible](./A2C/a2c_continuous_action.py)  |
+|    A3C     | TD / On-Policy  | [Possible](./A3C/a3c_discrete_action.py) | [Possible](./A3C/a3c_continuous_action.py)  |
+|    PPO     | TD / On-Policy  | [Possible](./PPO/ppo_discrete_action.py) | [Possible](./PPO/ppo_continuouts_action.py) |
+|    TRPO    | TD / On-Policy  |                 Possible                 |                  Possible                   |
+|   ACKTR    | TD / On-Policy  |                 Possible                 |                  Possible                   |
+|    ACER    | TD / Off-Policy |                 Possible                 |                  Possible                   |
+|    SAC     | TD / Off-Policy |                 Possible                 |                  Possible                   |
+|    DDPG    | TD / Off-Policy |                Impossible                |                  Possible                   |
+|    TD3     | TD / Off-Policy |                Impossible                |                  Possible                   |
 
 
 ## Papers
@@ -32,10 +32,6 @@ This repository contains code and performance comparison metrics that implement 
 * [Trust Region Policy Optimization](https://arxiv.org/abs/1502.05477)
 * [Playing Atari with Deep Reinforcement Learning](https://arxiv.org/abs/1312.5602)
 * [Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor](https://arxiv.org/abs/1801.01290)
-
-## Results
-
-## Useage
 
 ## Reference
 - https://github.com/carpedm20/deep-rl-tensorflow
