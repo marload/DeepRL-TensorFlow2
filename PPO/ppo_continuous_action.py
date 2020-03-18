@@ -58,6 +58,7 @@ class Actor:
 
     def compute_loss(self, log_old_policy, log_new_policy, actions, gaes):
         ratio = tf.exp(log_new_policy - tf.stop_gradient(log_old_policy))
+        gaes = tf.stop_gradient(gaes)
         clipped_ratio = tf.clip_by_value(
             ratio, 1.0-args.clip_ratio, 1.0+args.clip_ratio)
         surrogate = -tf.minimum(ratio * gaes, clipped_ratio * gaes)
