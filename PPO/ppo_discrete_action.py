@@ -38,8 +38,10 @@ class Actor:
         ])
 
     def compute_loss(self, old_policy, new_policy, actions, gaes):
+        gaes = tf.stop_gradient(gaes)
         old_log_p = tf.math.log(
             tf.reduce_sum(old_policy * actions))
+        old_log_p = tf.stop_gradient(old_log_p)
         log_p = tf.math.log(tf.reduce_sum(
             new_policy * actions))
         ratio = tf.math.exp(log_p - old_log_p)
