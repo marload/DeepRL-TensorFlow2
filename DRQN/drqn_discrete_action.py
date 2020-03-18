@@ -1,6 +1,6 @@
 import wandb
 import tensorflow as tf
-from tensorflow.keras.layers import Input, Dense, Lambda
+from tensorflow.keras.layers import Input, Dense, LSTM, Lambda
 
 import gym
 import argparse
@@ -9,11 +9,11 @@ from collections import deque
 import random
 
 tf.keras.backend.set_floatx('float64')
-wandb.init(name='DQN', project="deep-rl-tf2")
+wandb.init(name='DRQN', project="deep-rl-tf2")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', type=float, default=0.95)
-parser.add_argument('--time_steps', type=int, default=3)
+parser.add_argument('--time_steps', type=int, default=4)
 parser.add_argument('--lr', type=float, default=0.005)
 parser.add_argument('--batch_size', type=int, default=32)
 parser.add_argument('--tau', type=float, default=0.125)
@@ -46,15 +46,14 @@ class Agent:
 
     def create_model(self):
         return tf.keras.Sequential([
-            Input((self.state_dim * args.time_steps,)),
-            Dense(128, activation='relu'),
+            Input((args.time_steps, self.state_dim)),
+            LSTM(128, activation='tanh'),
             Dense(128, activation='relu'),
             Dense(self.action_dim)
         ])
 
     def get_action(self, training=True):
-        states = self.stored_states.reshape(
-            (1, self.state_dim * args.time_steps))
+        states = np.expand_dims(self.stored_states, axis=0)
         self.eps *= self.eps_decay
         self.eps = max(self.eps_min, self.eps)
         eps = self.eps if training else 0.01
@@ -92,15 +91,13 @@ class Agent:
         batch_target = []
         for sample in samples:
             states, action, reward, next_states, done = sample
-            batch_states.append(states.reshape(
-                self.state_dim * args.time_steps))
-            states = states.reshape((1, self.state_dim * args.time_steps))
+            batch_states.append(states)
+            states = np.expand_dims(states, axis=0)
             target = self.t_model.predict(states)[0]
             if done:
                 target[action] = reward
             else:
-                next_states = next_states.reshape(
-                    (1, self.state_dim * args.time_steps))
+                next_states = np.expand_dims(next_states, axis=0)
                 next_q_value = max(self.t_model.predict(next_states)[0])
                 target[action] = reward + next_q_value * args.gamma
             batch_target.append(target)

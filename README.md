@@ -6,23 +6,23 @@ This repository contains code and performance comparison metrics that implement 
 | CartPole-v1 | ![discrete](./assets/discrete_reward_plot.png) |
 
 ## Algorithms
-|    Name    |     Method      |             Discrete Action              |             Continuous  Action              |
-| :--------: | :-------------: | :--------------------------------------: | :-----------------------------------------: |
-|    DQN     | TD / Off-Policy | [Possible](./DQN/dqn_discrete_action.py) |                 Impossible                  |
-|    DRQN    | TD / Off-Policy |                 Possible                 |                 Impossible                  |
-| DuelingDQN | TD / Off-Policy |                 Possible                 |                 Impossible                  |
-| DoubleDQN  | TD / Off-Policy |                 Possible                 |                 Impossible                  |
-| RainbowDQN | TD / Off-Policy |                 Possible                 |                 Impossible                  |
-| REINFORCE  | MC / On-Policy  |                 Possible                 |                  Possible                   |
-|    A2C     | TD / On-Policy  | [Possible](./A2C/a2c_discrete_action.py) | [Possible](./A2C/a2c_continuous_action.py)  |
-|    A3C     | TD / On-Policy  | [Possible](./A3C/a3c_discrete_action.py) | [Possible](./A3C/a3c_continuous_action.py)  |
-|    PPO     | TD / On-Policy  | [Possible](./PPO/ppo_discrete_action.py) | [Possible](./PPO/ppo_continuouts_action.py) |
-|    TRPO    | TD / On-Policy  |                 Possible                 |                  Possible                   |
-|   ACKTR    | TD / On-Policy  |                 Possible                 |                  Possible                   |
-|    ACER    | TD / Off-Policy |                 Possible                 |                  Possible                   |
-|    SAC     | TD / Off-Policy |                 Possible                 |                  Possible                   |
-|    DDPG    | TD / Off-Policy |                Impossible                |                  Possible                   |
-|    TD3     | TD / Off-Policy |                Impossible                |                  Possible                   |
+|    Name    |     Method      |              Discrete Action               |             Continuous  Action              |
+| :--------: | :-------------: | :----------------------------------------: | :-----------------------------------------: |
+|    DQN     | TD / Off-Policy |  [Possible](./DQN/dqn_discrete_action.py)  |                 Impossible                  |
+|    DRQN    | TD / Off-Policy | [Possible](./DRQN/drqn_discrete_action.py) |                 Impossible                  |
+| DuelingDQN | TD / Off-Policy |                  Possible                  |                 Impossible                  |
+| DoubleDQN  | TD / Off-Policy |                  Possible                  |                 Impossible                  |
+| RainbowDQN | TD / Off-Policy |                  Possible                  |                 Impossible                  |
+| REINFORCE  | MC / On-Policy  |                  Possible                  |                  Possible                   |
+|    A2C     | TD / On-Policy  |  [Possible](./A2C/a2c_discrete_action.py)  | [Possible](./A2C/a2c_continuous_action.py)  |
+|    A3C     | TD / On-Policy  |  [Possible](./A3C/a3c_discrete_action.py)  | [Possible](./A3C/a3c_continuous_action.py)  |
+|    PPO     | TD / On-Policy  |  [Possible](./PPO/ppo_discrete_action.py)  | [Possible](./PPO/ppo_continuouts_action.py) |
+|    TRPO    | TD / On-Policy  |                  Possible                  |                  Possible                   |
+|   ACKTR    | TD / On-Policy  |                  Possible                  |                  Possible                   |
+|    ACER    | TD / Off-Policy |                  Possible                  |                  Possible                   |
+|    SAC     | TD / Off-Policy |                  Possible                  |                  Possible                   |
+|    DDPG    | TD / Off-Policy |                 Impossible                 |                  Possible                   |
+|    TD3     | TD / Off-Policy |                 Impossible                 |                  Possible                   |
 
 
 ## Papers
