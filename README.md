@@ -38,10 +38,10 @@ This repository contains code and performance comparison metrics that implement 
 ## Useage
 
 ## Reference
-https://github.com/carpedm20/deep-rl-tensorflow
-https://github.com/Yeachan-Heo/Reinforcement-Learning-Book
-https://github.com/pasus/Reinforcement-Learning-Book
-https://github.com/vcadillog/PPO-Mario-Bros-Tensorflow-2
-https://spinningup.openai.com/en/latest/spinningup/keypapers.html
-https://github.com/seungeunrho/minimalRL
-https://github.com/openai/baselines
+- https://github.com/carpedm20/deep-rl-tensorflow
+- https://github.com/Yeachan-Heo/Reinforcement-Learning-Book
+- https://github.com/pasus/Reinforcement-Learning-Book
+- https://github.com/vcadillog/PPO-Mario-Bros-Tensorflow-2
+- https://spinningup.openai.com/en/latest/spinningup/keypapers.html
+- https://github.com/seungeunrho/minimalRL
+- https://github.com/openai/baselines
