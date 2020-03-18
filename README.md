@@ -6,23 +6,23 @@ This repository contains code and performance comparison metrics that implement 
 | ![discrete](./assets/discrete_reward_plot.png) | Comming Soon |
 
 ## Algorithms
-|    Name    |               Discrete               |               Continuous               |
-| :--------: | :----------------------------------: | :------------------------------------: |
-|    DQN     |             Comming Soon             |             NOT SUPPORTED              |
-|    DRQN    |             Comming Soon             |             NOT SUPPORTED              |
-| DuelingDQN |             Comming Soon             |             NOT SUPPORTED              |
-| DoubleDQN  |             Comming Soon             |             NOT SUPPORTED              |
-| RainbowDQN |             Comming Soon             |             NOT SUPPORTED              |
-| REINFORCE  |             Comming Soon             |              Comming Soon              |
-|    A2C     | [Code](./A2C/a2c_discrete_action.py) | [Code](./A2C/a2c_continuous_action.py) |
-|    A3C     | [Code](./A3C/a3c_discrete_action.py) |              Comming Soon              |
-|    PPO     | [Code](./ppo/ppo_discrete_action.py) |              Comming Soon              |
-|    TRPO    |             Comming Soon             |              Comming Soon              |
-|   ACKTR    |             Comming Soon             |              Comming Soon              |
-|    ACER    |             Comming Soon             |              Comming Soon              |
-|    SAC     |             Comming Soon             |              Comming Soon              |
-|    DPG     |            NOT SUPPORTED             |              Comming Soon              |
-|    TD3     |            NOT SUPPORTED             |              Comming Soon              |
+|    Name    |               Discrete               |               Continuous                |
+| :--------: | :----------------------------------: | :-------------------------------------: |
+|    DQN     |             Comming Soon             |              NOT SUPPORTED              |
+|    DRQN    |             Comming Soon             |              NOT SUPPORTED              |
+| DuelingDQN |             Comming Soon             |              NOT SUPPORTED              |
+| DoubleDQN  |             Comming Soon             |              NOT SUPPORTED              |
+| RainbowDQN |             Comming Soon             |              NOT SUPPORTED              |
+| REINFORCE  |             Comming Soon             |              Comming Soon               |
+|    A2C     | [Code](./A2C/a2c_discrete_action.py) | [Code](./A2C/a2c_continuous_action.py)  |
+|    A3C     | [Code](./A3C/a3c_discrete_action.py) |              Comming Soon               |
+|    PPO     | [Code](./ppo/ppo_discrete_action.py) | [Code](./ppo/ppo_continuouts_action.py) |
+|    TRPO    |             Comming Soon             |              Comming Soon               |
+|   ACKTR    |             Comming Soon             |              Comming Soon               |
+|    ACER    |             Comming Soon             |              Comming Soon               |
+|    SAC     |             Comming Soon             |              Comming Soon               |
+|    DPG     |            NOT SUPPORTED             |              Comming Soon               |
+|    TD3     |            NOT SUPPORTED             |              Comming Soon               |
 
 
 ## Papers
