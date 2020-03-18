@@ -1,7 +1,7 @@
 # Deep RL in TensorFlow2
 This repository contains code and performance comparison metrics that implement popular Deep Reinforcement Learning algorithms in TensorFlow2.
 
-|     ENV     |                    Discrete                    |
+|     ENV     |                  Reward Plot                   |
 | :---------: | :--------------------------------------------: |
 | CartPole-v1 | ![discrete](./assets/discrete_reward_plot.png) |
 
