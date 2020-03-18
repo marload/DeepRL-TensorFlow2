@@ -8,7 +8,7 @@ import numpy as np
 
 tf.keras.backend.set_floatx('float64')
 
-# wandb.init(name='PPO', project="deep-rl-tf2")
+wandb.init(name='PPO', project="deep-rl-tf2")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', type=float, default=0.99)
@@ -191,7 +191,7 @@ class Agent:
                 state = next_state[0]
 
             print('EP{} EpisodeReward={}'.format(ep, episode_reward))
-            # wandb.log({'Reward': episode_reward})
+            wandb.log({'Reward': episode_reward})
 
 
 def main():
