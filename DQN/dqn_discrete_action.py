@@ -1,3 +1,5 @@
+# NOTE This model may not be working properly yet.
+
 import wandb
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense, Lambda
