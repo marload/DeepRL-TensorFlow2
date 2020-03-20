@@ -9,7 +9,7 @@ from collections import deque
 import random
 
 tf.keras.backend.set_floatx('float64')
-# wandb.init(name='DQN', project="deep-rl-tf2")
+wandb.init(name='DQN', project="deep-rl-tf2")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', type=float, default=0.95)
@@ -132,6 +132,7 @@ class Agent:
                 total_reward += reward
             self.update_target_model()
             print('EP{} EpisodeReward={}'.format(ep, total_reward))
+            wandb.log({'Reward': total_reward})
 
 def main():
     env = gym.make('CartPole-v1')
