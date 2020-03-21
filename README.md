@@ -1,4 +1,5 @@
 # 🐋 Deep RL in TensorFlow2
+
 This repository contains code and performance comparison metrics that implement popular Deep Reinforcement Learning algorithms in TensorFlow2. Note that this repository is not yet perfect. If you find a better Hyper Parameter Set, we would appreciate it if you let us know! I will continue to update.
 
 |     ENV     |                  Reward Plot                   |
@@ -6,7 +7,8 @@ This repository contains code and performance comparison metrics that implement 
 | CartPole-v1 | ![discrete](./assets/discrete_reward_plot.png) |
 
 ## Algorithms
-|    Name    |     Method      |              Discrete Action               |             Continuous  Action              |
+
+|    Name    |     Method      |              Discrete Action               |              Continuous Action              |
 | :--------: | :-------------: | :----------------------------------------: | :-----------------------------------------: |
 |    DQN     | TD / Off-Policy |  [Possible](./DQN/dqn_discrete_action.py)  |                 Impossible                  |
 |    DRQN    | TD / Off-Policy | [Possible](./DRQN/drqn_discrete_action.py) |                 Impossible                  |
@@ -24,16 +26,36 @@ This repository contains code and performance comparison metrics that implement 
 |    DDPG    | TD / Off-Policy |                 Impossible                 |                  Possible                   |
 |    TD3     | TD / Off-Policy |                 Impossible                 |                  Possible                   |
 
+## Usage
+
+Discrete Action Space Asyncronous Advantage Actor-Critic
+
+```
+$ python A3C/a3c_discrete_action.py
+```
+
+Deep Q-Learning
+
+```
+$ python DQN/dqn_discrete_action.py
+```
+
+Continuous Action Space Proximal Policy Optimization
+
+```
+$ python PPO/ppo_continuous_action.py
+```
 
 ## Papers
 
-* [Asynchronous Methods for Deep Reinforcement Learning](https://arxiv.org/abs/1602.01783)
-* [Proximal Policy Optimization Algorithms](https://arxiv.org/abs/1707.06347)
-* [Trust Region Policy Optimization](https://arxiv.org/abs/1502.05477)
-* [Playing Atari with Deep Reinforcement Learning](https://arxiv.org/abs/1312.5602)
-* [Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor](https://arxiv.org/abs/1801.01290)
+- [Asynchronous Methods for Deep Reinforcement Learning](https://arxiv.org/abs/1602.01783)
+- [Proximal Policy Optimization Algorithms](https://arxiv.org/abs/1707.06347)
+- [Trust Region Policy Optimization](https://arxiv.org/abs/1502.05477)
+- [Playing Atari with Deep Reinforcement Learning](https://arxiv.org/abs/1312.5602)
+- [Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor](https://arxiv.org/abs/1801.01290)
 
 ## Reference
+
 - https://github.com/carpedm20/deep-rl-tensorflow
 - https://github.com/Yeachan-Heo/Reinforcement-Learning-Book
 - https://github.com/pasus/Reinforcement-Learning-Book
