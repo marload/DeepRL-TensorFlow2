@@ -42,7 +42,7 @@ class ActionValueModel:
     def create_model(self):
         return tf.keras.Sequential([
             Input((args.time_steps, self.state_dim)),
-            LSTM(128, activation='relu'),
+            LSTM(16, activation='relu'),
             Dense(128, activation='relu'),
             Dense(128, activation='relu'),
             Dense(self.action_dim)
