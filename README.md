@@ -1,4 +1,4 @@
-!()[https://img.shields.io/badge/TensorFlow-2.1-orange]
+![TF Depend](https://img.shields.io/badge/TensorFlow-2.1-orange)
 # 🐋 Deep RL in TensorFlow2
 
 This repository contains code and performance comparison metrics that implement popular Deep Reinforcement Learning algorithms in TensorFlow2. Note that this repository is not yet perfect. If you find a better Hyper Parameter Set, we would appreciate it if you let us know! I will continue to update.
