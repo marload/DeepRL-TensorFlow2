@@ -11,7 +11,7 @@ from collections import deque
 import random
 
 tf.keras.backend.set_floatx('float64')
-wandb.init(name='DQN', project="deep-rl-tf2")
+# wandb.init(name='DQN', project="deep-rl-tf2")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', type=float, default=0.95)
@@ -36,7 +36,7 @@ class ActionValueModel:
         self.eps_decay = args.eps_decay
         self.eps_min = args.eps_min
 
-        self.compute_loss = tf.keras.losses.MeanSquareError()
+        self.compute_loss = tf.keras.losses.MeanSquaredError()
         self.opt = tf.keras.optimizers.Adam(args.lr)
         self.model = self.create_model()
 
@@ -85,7 +85,7 @@ class Agent:
         self.update_target_model()
     
     def update_target_model(self):
-        self.target_model.model.set_weight(self.model.model.get_weight())
+        self.target_model.model.set_weights(self.model.model.get_weights())
 
     def update_states(self, next_state):
         self.stored_states = np.roll(self.stored_states, -1, axis=0)
@@ -134,7 +134,7 @@ class Agent:
                 total_reward += reward
             self.update_target_model()
             print('EP{} EpisodeReward={}'.format(ep, total_reward))
-            wandb.log({'Reward': total_reward})
+            # wandb.log({'Reward': total_reward})
 
 def main():
     env = gym.make('CartPole-v1')
