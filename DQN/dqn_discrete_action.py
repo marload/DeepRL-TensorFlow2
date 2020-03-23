@@ -1,5 +1,3 @@
-# NOTE This model may not be working properly yet.
-
 import wandb
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense, Lambda
@@ -11,7 +9,7 @@ from collections import deque
 import random
 
 tf.keras.backend.set_floatx('float64')
-# wandb.init(name='DQN', project="deep-rl-tf2")
+wandb.init(name='DQN', project="deep-rl-tf2")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', type=float, default=0.95)
@@ -23,6 +21,7 @@ parser.add_argument('--eps', type=float, default=1.0)
 parser.add_argument('--eps_decay', type=float, default=0.995)
 parser.add_argument('--eps_min', type=float, default=0.01)
 parser.add_argument('--train_start', type=int, default=100)
+parser.add_argument('--update_interval', type=int, default=5)
 
 args = parser.parse_args()
 
@@ -82,6 +81,7 @@ class Agent:
         self.stored_states = np.zeros((args.time_steps, self.state_dim))
         self.model = ActionValueModel(self.state_dim, self.action_dim)
         self.target_model = ActionValueModel(self.state_dim, self.action_dim)
+        self.update_count = 0
         self.update_target_model()
     
     def update_target_model(self):
@@ -115,7 +115,8 @@ class Agent:
                 next_q_value = max(self.target_model.predict(next_state)[0])
                 target[action] = train_reward + next_q_value * args.gamma
             batch_target.append(target)
-            self.model.train(np.array(batch_states), np.array(batch_target))    
+            self.model.train(np.array(batch_states), np.array(batch_target))
+            self.update_count = 0
      
     def train(self, max_episodes=1000):
         for ep in range(max_episodes):
@@ -131,12 +132,13 @@ class Agent:
                 self.update_states(next_state)
                 self.put_memory(prev_stored_states, action, reward, self.stored_states, done)
 
-                if len(self.memory) > args.train_start:
+                if len(self.memory) > args.train_start and args.update_interval < self.update_count:
                     self.replay()
                 total_reward += reward
+                self.update_count += 1
             self.update_target_model()
             print('EP{} EpisodeReward={}'.format(ep, total_reward))
-            # wandb.log({'Reward': total_reward})
+            wandb.log({'Reward': total_reward})
 
 def main():
     env = gym.make('CartPole-v1')
