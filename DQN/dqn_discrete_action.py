@@ -22,7 +22,7 @@ parser.add_argument('--tau', type=float, default=0.125)
 parser.add_argument('--eps', type=float, default=1.0)
 parser.add_argument('--eps_decay', type=float, default=0.995)
 parser.add_argument('--eps_min', type=float, default=0.01)
-parser.add_argument('--train_start', type=int, default=1000)
+parser.add_argument('--train_start', type=int, default=100)
 
 args = parser.parse_args()
 
@@ -49,7 +49,7 @@ class ActionValueModel:
         ])
 
     def predict(self, state):
-        self.model.predict(state)
+        return self.model.predict(state)
 
     def get_action(self, state, training=True):
         state = state.reshape(1, args.time_steps * self.state_dim)
@@ -62,7 +62,7 @@ class ActionValueModel:
         return np.argmax(q_value)
     
     def train(self, state, target):
-        state = state.reshape(1, args.time_steps * self.state_dim)
+        state = state.reshape(-1, args.time_steps * self.state_dim)
         with tf.GradientTape() as tape:
             logits = self.model(state, training=True)
             assert logits.shape == target.shape
@@ -107,11 +107,12 @@ class Agent:
             state = state.reshape((1, args.time_steps * self.state_dim))
             target = self.target_model.predict(state)[0]
             train_reward = reward * 0.01
+            
             if done:
                 target[action] = train_reward
             else:
                 next_state = next_state.reshape((1, args.time_steps * self.state_dim))
-                next_q_value = max(self.target_model.predict(next_state))
+                next_q_value = max(self.target_model.predict(next_state)[0])
                 target[action] = train_reward + next_q_value * args.gamma
             batch_target.append(target)
             self.model.train(np.array(batch_states), np.array(batch_target))    
@@ -123,6 +124,7 @@ class Agent:
             state = self.env.reset()
             self.update_states(state)
             while not done:
+                # self.env.render()
                 action = self.model.get_action(self.stored_states)
                 next_state, reward, done, _ = self.env.step(action)
                 prev_stored_states = self.stored_states
