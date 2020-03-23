@@ -6,29 +6,13 @@
 
 This repository contains code and performance comparison metrics that implement popular Deep Reinforcement Learning algorithms in TensorFlow2. Note that this repository is not yet perfect. If you find a better Hyper Parameter Set, we would appreciate it if you let us know! I will continue to update.
 
+[TOC]
+
 |     ENV     |                  Reward Plot                   |
 | :---------: | :--------------------------------------------: |
 | CartPole-v1 | ![discrete](./assets/discrete_reward_plot.png) |
 
 ## Algorithms
-
-|    Name    |     Method      |              Discrete Action               |              Continuous Action              |
-| :--------: | :-------------: | :----------------------------------------: | :-----------------------------------------: |
-|    DQN     | TD / Off-Policy |  [Possible](./DQN/dqn_discrete_action.py)  |                 Impossible                  |
-|    DRQN    | TD / Off-Policy | [Possible](./DRQN/drqn_discrete_action.py) |                 Impossible                  |
-| DuelingDQN | TD / Off-Policy |                  Possible                  |                 Impossible                  |
-| DoubleDQN  | TD / Off-Policy |                  Possible                  |                 Impossible                  |
-| RainbowDQN | TD / Off-Policy |                  Possible                  |                 Impossible                  |
-| REINFORCE  | MC / On-Policy  |                  Possible                  |                  Possible                   |
-|    A2C     | TD / On-Policy  |  [Possible](./A2C/a2c_discrete_action.py)  | [Possible](./A2C/a2c_continuous_action.py)  |
-|    A3C     | TD / On-Policy  |  [Possible](./A3C/a3c_discrete_action.py)  | [Possible](./A3C/a3c_continuous_action.py)  |
-|    PPO     | TD / On-Policy  |  [Possible](./PPO/ppo_discrete_action.py)  | [Possible](./PPO/ppo_continuouts_action.py) |
-|    TRPO    | TD / On-Policy  |                  Possible                  |                  Possible                   |
-|   ACKTR    | TD / On-Policy  |                  Possible                  |                  Possible                   |
-|    ACER    | TD / Off-Policy |                  Possible                  |                  Possible                   |
-|    SAC     | TD / Off-Policy |                  Possible                  |                  Possible                   |
-|    DDPG    | TD / Off-Policy |                 Impossible                 |                  Possible                   |
-|    TD3     | TD / Off-Policy |                 Impossible                 |                  Possible                   |
 
 ### DQN
 
@@ -68,12 +52,14 @@ This repository contains code and performance comparison metrics that implement 
 
 ### PPO
 
-|  Name  |                       Proximal Policy Optimization                        |
-| :----: | :-----------------------------------------------------------------------: |
-| Paper  |     [Proximal Policy Optimization](https://arxiv.org/abs/1707.06347)      |
-| Author | John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, Oleg Klimov |
-| Method |                      Temporal Diffrence / On-Policy                       |
-| Action |                           [Discrete](./PPO/ppo_discrete_action.py) / [Continuous](./PPO/ppo_continuous_action.py)                           |
+|  Name  |                              Proximal Policy Optimization                               |
+| :----: | :-------------------------------------------------------------------------------------: |
+| Paper  |            [Proximal Policy Optimization](https://arxiv.org/abs/1707.06347)             |
+| Author |        John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, Oleg Klimov        |
+| Method |                             Temporal Diffrence / On-Policy                              |
+| Action | [Discrete](./PPO/ppo_discrete_action.py) / [Continuous](./PPO/ppo_continuous_action.py) |
+
+### Comming Soon...
 
 ## Usage
 
