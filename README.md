@@ -4,7 +4,7 @@
 
 # 🐋 Deep RL in TensorFlow2
 
-This repository contains code and performance comparison metrics that implement popular Deep Reinforcement Learning algorithms in TensorFlow2. Note that this repository is not yet perfect. If you find a better Hyper Parameter Set, we would appreciate it if you let us know! I will continue to update.
+This repository uses [TensorFlow2](https://github.com/tensorflow/tensorflow) to implement a variety of popular Reinforcement Learning algorithms. We've used the environments in [OpenAI gym](https://github.com/openai/gym) and our goal is to continuously update them to implement all of the algorithms specified in [OpenAI Spinning Up](https://spinningup.openai.com/en/latest/spinningup/keypapers.html).
 
 
 |     ENV     |                  Reward Plot                   |
