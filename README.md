@@ -30,6 +30,51 @@ This repository contains code and performance comparison metrics that implement 
 |    DDPG    | TD / Off-Policy |                 Impossible                 |                  Possible                   |
 |    TD3     | TD / Off-Policy |                 Impossible                 |                  Possible                   |
 
+### DQN
+
+|  Name  |                                                  Deep Q-Learning                                                   |
+| :----: | :----------------------------------------------------------------------------------------------------------------: |
+| Paper  |                 [Playing Atari with Deep Reinforcement Learning](https://arxiv.org/abs/1312.5602)                  |
+| Author | Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis Antonoglou, Daan Wierstra, Martin Riedmiller |
+| Method |                                          Temporal Diffrence / Off-Policy                                           |
+| Action |                                      [Discrete](./DQN/dqn_discrete_action.py)                                      |
+
+### DRQN
+
+|  Name  |                                  Deep Recurrent Q-Learning                                  |
+| :----: | :-----------------------------------------------------------------------------------------: |
+| Paper  | [Deep Recurrent Q-Learning for Partially Observable MDPs](https://arxiv.org/abs/1507.06527) |
+| Author |                               Matthew Hausknecht, Peter Stone                               |
+| Method |                               Temporal Diffrence / Off-Policy                               |
+| Action |                         [Discrete](./DRQN/drqn_discrete_action.py)                          |
+
+### A2C
+
+|  Name  |                                  Advantage Actor-Critic                                  |
+| :----: | :--------------------------------------------------------------------------------------: |
+| Paper  | [Actor-Critic Algorithms](https://papers.nips.cc/paper/1786-actor-critic-algorithms.pdf) |
+| Author |                            Vijay R. Konda, John N. Tsitsiklis                            |
+| Method |                              Temporal Diffrence / On-Policy                              |
+| Action | [Discrete](./A2C/a2c_discrete_action.py) / [Continuous](./A2C/a2c_continuous_action.py)  |
+
+### A3C
+
+|  Name  |                                                  Asyncronous Advantage Actor-Critic                                                   |
+| :----: | :-----------------------------------------------------------------------------------------------------------------------------------: |
+| Paper  |                       [Asynchronous Methods for Deep Reinforcement Learning](https://arxiv.org/abs/1602.01783)                        |
+| Author | Volodymyr Mnih, Adrià Puigdomènech Badia, Mehdi Mirza, Alex Graves, Timothy P. Lillicrap, Tim Harley, David Silver, Koray Kavukcuoglu |
+| Method |                                                    Temporal Diffrence / On-Policy                                                     |
+| Action |                        [Discrete](./A3C/a3c_discrete_action.py) / [Continuous](./A3C/a3c_continuous_action.py)                        |
+
+### PPO
+
+|  Name  |                       Proximal Policy Optimization                        |
+| :----: | :-----------------------------------------------------------------------: |
+| Paper  |     [Proximal Policy Optimization](https://arxiv.org/abs/1707.06347)      |
+| Author | John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, Oleg Klimov |
+| Method |                      Temporal Diffrence / On-Policy                       |
+| Action |                           [Discrete](./PPO/ppo_discrete_action.py) / [Continuous](./PPO/ppo_continuous_action.py)                           |
+
 ## Usage
 
 Discrete Action Space Asyncronous Advantage Actor-Critic
