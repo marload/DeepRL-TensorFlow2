@@ -1,9 +1,8 @@
-![TF Depend](https://img.shields.io/badge/TensorFlow-2.1-orange)
-![GYM Depend](https://img.shields.io/badge/openai%2Fgym-0.17.1-blue)
-![License Badge](https://img.shields.io/badge/license-Apache%202-green)
 
-# 🐋 Deep RL in TensorFlow2
 
+![logo](./assets/logo.png)
+
+![TF Depend](https://img.shields.io/badge/TensorFlow-2.1-orange) ![GYM Depend](https://img.shields.io/badge/openai%2Fgym-0.17.1-blue) ![License Badge](https://img.shields.io/badge/license-Apache%202-green)
 This repository uses [TensorFlow2](https://github.com/tensorflow/tensorflow) to implement a variety of popular Reinforcement Learning algorithms. We've used the environments in [OpenAI gym](https://github.com/openai/gym) and our goal is to continuously update them to implement all of the algorithms specified in [OpenAI Spinning Up](https://spinningup.openai.com/en/latest/spinningup/keypapers.html).
 
 
