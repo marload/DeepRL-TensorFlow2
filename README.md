@@ -245,7 +245,7 @@ $ python A3C/A3C_Continuous.py
 **Method** ON-Policy / Temporal-Diffrence / Model-Free<br>
 **Action** Discrete, Continuous<br>
 
-### Core of ideas
+#### Core of ideas
 ```python
 # idea01. Use Importance Sampling to act like an Off-Policy algorithm
 # idea02. Use clip to prevent rapid changes in parameters.
@@ -263,7 +263,7 @@ def compute_loss(self, old_policy, new_policy, actions, gaes):
     return tf.reduce_mean(surrogate)
 ```
 
-### Getting Start
+#### Getting Start
 ```bash
 # Discrete Action Space Proximal Policy Optimization
 $ python PPO/PPO_Discrete.py
