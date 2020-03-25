@@ -97,16 +97,48 @@ $ python PPO/PPO_Discrete.py
 $ python PPO/PPO_Continuous.py
 ```
 
-### Comming Soon...
+### TRPO
+**Paper** [Trust Region Policy Optimization](https://arxiv.org/abs/1502.05477)<br>
+**Author** John Schulman, Sergey Levine, Philipp Moritz, Michael I. Jordan, Pieter Abbeel<br>
+**Method** OFF-Policy / Temporal-Diffrence / Model-Free<br>
+**Action** Discrete, Continuous<br>
+
+```bash
+# NOTE: Not yet implemented!
+```
+
+### DDPG
+**Paper** [Continuous control with deep reinforcement learning](https://arxiv.org/abs/1509.02971)<br>
+**Author** Timothy P. Lillicrap, Jonathan J. Hunt, Alexander Pritzel, Nicolas Heess, Tom Erez, Yuval Tassa, David Silver, Daan Wierstra<br>
+**Method** OFF-Policy / Temporal-Diffrence / Model-Free<br>
+**Action** Continuous<br>
+
+```bash
+# NOTE: Not yet implemented!
+```
+
+### TD3
+**Paper** [Addressing Function Approximation Error in Actor-Critic Methods](https://arxiv.org/abs/1802.09477)<br>
+**Author** Scott Fujimoto, Herke van Hoof, David Meger<br>
+**Method** OFF-Policy / Temporal-Diffrence / Model-Free<br>
+**Action** Continuous<br>
+
+```bash
+# NOTE: Not yet implemented!
+```
+
+### SAC
+**Paper** [Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor
+](https://arxiv.org/abs/1801.01290)<br>
+**Author** Tuomas Haarnoja, Aurick Zhou, Pieter Abbeel, Sergey Levine<br>
+**Method** OFF-Policy / Temporal-Diffrence / Model-Free<br>
+**Action** Discrete, Continuous<br>
+
+```bash
+# NOTE: Not yet implemented!
+```
 
 
-## Papers
-
-- [Asynchronous Methods for Deep Reinforcement Learning](https://arxiv.org/abs/1602.01783)
-- [Proximal Policy Optimization Algorithms](https://arxiv.org/abs/1707.06347)
-- [Trust Region Policy Optimization](https://arxiv.org/abs/1502.05477)
-- [Playing Atari with Deep Reinforcement Learning](https://arxiv.org/abs/1312.5602)
-- [Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor](https://arxiv.org/abs/1801.01290)
 
 ## Reference
 
