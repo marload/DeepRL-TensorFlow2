@@ -14,12 +14,12 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', type=float, default=0.99)
 parser.add_argument('--update_interval', type=int, default=5)
 parser.add_argument('--actor_lr', type=float, default=0.0005)
-parser.add_argument('--critic_lr', type=float, default=0.002)
+parser.add_argument('--critic_lr', type=float, default=0.001)
 
 args = parser.parse_args()
 
 CUR_EPISODE = 0
-
+A
 
 class Actor:
     def __init__(self, state_dim, action_dim, action_bound, std_bound):
@@ -33,8 +33,8 @@ class Actor:
 
     def create_model(self):
         state_input = Input((self.state_dim,))
-        dense_1 = Dense(128, activation='relu')(state_input)
-        dense_2 = Dense(128, activation='relu')(dense_1)
+        dense_1 = Dense(32, activation='relu')(state_input)
+        dense_2 = Dense(32, activation='relu')(dense_1)
         out_mu = Dense(self.action_dim, activation='tanh')(dense_2)
         mu_output = Lambda(lambda x: x * self.action_bound)(out_mu)
         std_output = Dense(self.action_dim, activation='softplus')(dense_2)
@@ -76,8 +76,9 @@ class Critic:
     def create_model(self):
         return tf.keras.Sequential([
             Input((self.state_dim,)),
-            Dense(128, activation='relu'),
-            Dense(128, activation='relu'),
+            Dense(32, activation='relu'),
+            Dense(32, activation='relu'),
+            Dense(16, activation='relu'),
             Dense(1, activation='linear')
         ])
 

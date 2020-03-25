@@ -23,7 +23,7 @@ parser.add_argument('--eps_min', type=float, default=0.01)
 args = parser.parse_args()
 
 class ReplayBuffer:
-    def __init__(self, capacity=1000):
+    def __init__(self, capacity=10000):
         self.buffer = deque(maxlen=capacity)
     
     def put(self, state, action, reward, next_state, done):
@@ -90,11 +90,12 @@ class Agent:
         self.target_model.model.set_weights(weights)
     
     def replay(self):
-        states, actions, rewards, next_states, done = self.buffer.sample()
-        targets = self.target_model.predict(states)
-        next_q_values = self.target_model.predict(next_states).max(axis=1)
-        targets[range(args.batch_size), actions] = rewards + (1-done) * next_q_values * args.gamma
-        self.model.train(states, targets)
+        for _ in range(10):
+            states, actions, rewards, next_states, done = self.buffer.sample()
+            targets = self.target_model.predict(states)
+            next_q_values = self.target_model.predict(next_states).max(axis=1)
+            targets[range(args.batch_size), actions] = rewards + (1-done) * next_q_values * args.gamma
+            self.model.train(states, targets)
     
     def train(self, max_episodes=1000):
         for ep in range(max_episodes):
@@ -104,11 +105,10 @@ class Agent:
                 action = self.model.get_action(state)
                 next_state, reward, done, _ = self.env.step(action)
                 self.buffer.put(state, action, reward*0.01, next_state, done)
-
-                if self.buffer.size() >= args.batch_size:
-                    self.replay()
                 total_reward += reward
                 state = next_state
+            if self.buffer.size() >= args.batch_size:
+                self.replay()
             self.target_update()
             print('EP{} EpisodeReward={}'.format(ep, total_reward))
             wandb.log({'Reward': total_reward})
