@@ -177,6 +177,14 @@ $ python DuelingDQN/DuelingDQN_Discrete.py
 **Method** ON-Policy / Temporal-Diffrence / Model-Free<br>
 **Action** Discrete, Continuous<br>
 
+### Core of ideas
+```python
+# idea01. Use Advantage to reduce Variance
+def advatnage(self, td_targets, baselines):
+    return td_targets - baselines
+```
+
+#### Getting Start
 ```bash
 # Discrete Action Space Advantage Actor-Critic
 $ python A2C/A2C_Discrete.py
