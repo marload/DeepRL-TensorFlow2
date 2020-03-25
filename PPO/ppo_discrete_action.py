@@ -12,10 +12,10 @@ wandb.init(name='PPO', project="deep-rl-tf2")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', type=float, default=0.99)
-parser.add_argument('--update_interval', type=int, default=20)
+parser.add_argument('--update_interval', type=int, default=5)
 parser.add_argument('--actor_lr', type=float, default=0.0005)
-parser.add_argument('--critic_lr', type=float, default=0.002)
-parser.add_argument('--clip_ratio', type=float, default=0.2)
+parser.add_argument('--critic_lr', type=float, default=0.001)
+parser.add_argument('--clip_ratio', type=float, default=0.1)
 parser.add_argument('--lmbda', type=float, default=0.95)
 parser.add_argument('--epochs', type=int, default=3)
 
@@ -32,8 +32,8 @@ class Actor:
     def create_model(self):
         return tf.keras.Sequential([
             Input((self.state_dim,)),
-            Dense(128, activation='relu'),
-            Dense(128, activation='relu'),
+            Dense(32, activation='relu'),
+            Dense(16, activation='relu'),
             Dense(self.action_dim, activation='softmax')
         ])
 
@@ -72,8 +72,9 @@ class Critic:
     def create_model(self):
         return tf.keras.Sequential([
             Input((self.state_dim,)),
-            Input((self.state_dim,)),
-            Dense(128, activation='relu'),
+            Dense(32, activation='relu'),
+            Dense(16, activation='relu'),
+            Dense(16, activation='relu'),
             Dense(1, activation='linear')
         ])
 

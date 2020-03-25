@@ -1,6 +1,6 @@
 import wandb
 import tensorflow as tf
-from tensorflow.keras.layers import Input, Dense, LSTM, Lambda
+from tensorflow.keras.layers import Input, Dense, Flatten, Lambda
 
 import gym
 import argparse
@@ -9,7 +9,7 @@ from collections import deque
 import random
 
 tf.keras.backend.set_floatx('float64')
-wandb.init(name='DRQN', project="deep-rl-tf2")
+# wandb.init(name='DQN', project="deep-rl-tf2")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', type=float, default=0.85)
@@ -43,7 +43,7 @@ class ActionValueModel:
     def create_model(self):
         return tf.keras.Sequential([
             Input((args.time_steps, self.state_dim)),
-            LSTM(24, activation='tanh'),
+            Flatten(),
             Dense(32, activation='relu'),
             Dense(16, activation='relu'),
             Dense(16, activation='relu'),
@@ -148,7 +148,7 @@ class Agent:
                 self.update_count += 1
             self.update_target_model()
             print('EP{} EpisodeReward={}'.format(ep, total_reward))
-            wandb.log({'Reward': total_reward})
+            # wandb.log({'Reward': total_reward})
 
 def main():
     env = gym.make('CartPole-v1')

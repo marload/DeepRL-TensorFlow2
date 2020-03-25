@@ -5,7 +5,7 @@ from tensorflow.keras.layers import Input, Dense
 import gym
 import argparse
 import numpy as np
-from threading import Thread
+from threading import Thread, Lock
 from multiprocessing import cpu_count
 tf.keras.backend.set_floatx('float64')
 wandb.init(name='A3C', project="deep-rl-tf2")
@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', type=float, default=0.99)
 parser.add_argument('--update_interval', type=int, default=5)
 parser.add_argument('--actor_lr', type=float, default=0.0005)
-parser.add_argument('--critic_lr', type=float, default=0.002)
+parser.add_argument('--critic_lr', type=float, default=0.001)
 
 args = parser.parse_args()
 
@@ -32,8 +32,8 @@ class Actor:
     def create_model(self):
         return tf.keras.Sequential([
             Input((self.state_dim,)),
-            Dense(128, activation='relu'),
-            Dense(128, activation='relu'),
+            Dense(32, activation='relu'),
+            Dense(16, activation='relu'),
             Dense(self.action_dim, activation='softmax')
         ])
 
@@ -67,8 +67,9 @@ class Critic:
     def create_model(self):
         return tf.keras.Sequential([
             Input((self.state_dim,)),
-            Dense(128, activation='relu'),
-            Dense(128, activation='relu'),
+            Dense(32, activation='relu'),
+            Dense(16, activation='relu'),
+            Dense(16, activation='relu'),
             Dense(1, activation='linear')
         ])
 
@@ -115,6 +116,7 @@ class Agent:
 class WorkerAgent(Thread):
     def __init__(self, env, global_actor, global_critic, max_episodes):
         Thread.__init__(self)
+        self.lock = Lock()
         self.env = env
         self.state_dim = self.env.observation_space.shape[0]
         self.action_dim = self.env.action_space.n
@@ -185,16 +187,17 @@ class WorkerAgent(Thread):
                     td_targets = self.n_step_td_target(
                         rewards, next_v_value, done)
                     advantages = td_targets - self.critic.model.predict(states)
+                    
+                    with self.lock:
+                        actor_loss = self.global_actor.train(
+                            states, actions, advantages)
+                        critic_loss = self.global_critic.train(
+                            states, td_targets)
 
-                    actor_loss = self.global_actor.train(
-                        states, actions, advantages)
-                    critic_loss = self.global_critic.train(
-                        states, td_targets)
-
-                    self.actor.model.set_weights(
-                        self.global_actor.model.get_weights())
-                    self.critic.model.set_weights(
-                        self.global_critic.model.get_weights())
+                        self.actor.model.set_weights(
+                            self.global_actor.model.get_weights())
+                        self.critic.model.set_weights(
+                            self.global_critic.model.get_weights())
 
                     state_batch = []
                     action_batch = []

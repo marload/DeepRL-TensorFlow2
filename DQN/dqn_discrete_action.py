@@ -1,6 +1,6 @@
 import wandb
 import tensorflow as tf
-from tensorflow.keras.layers import Input, Dense, Lambda
+from tensorflow.keras.layers import Input, Dense, Flatten, Lambda
 
 import gym
 import argparse
@@ -12,7 +12,7 @@ tf.keras.backend.set_floatx('float64')
 wandb.init(name='DQN', project="deep-rl-tf2")
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--gamma', type=float, default=0.95)
+parser.add_argument('--gamma', type=float, default=0.85)
 parser.add_argument('--time_steps', type=int, default=3)
 parser.add_argument('--lr', type=float, default=0.005)
 parser.add_argument('--batch_size', type=int, default=32)
@@ -20,10 +20,11 @@ parser.add_argument('--tau', type=float, default=0.125)
 parser.add_argument('--eps', type=float, default=1.0)
 parser.add_argument('--eps_decay', type=float, default=0.995)
 parser.add_argument('--eps_min', type=float, default=0.01)
-parser.add_argument('--train_start', type=int, default=100)
-parser.add_argument('--update_interval', type=int, default=5)
+parser.add_argument('--train_start', type=int, default=32)
+parser.add_argument('--update_interval', type=int, default=1)
 
 args = parser.parse_args()
+DECAY_COUNT = 0
 
 
 class ActionValueModel:
@@ -41,7 +42,8 @@ class ActionValueModel:
 
     def create_model(self):
         return tf.keras.Sequential([
-            Input((self.state_dim * args.time_steps,)),
+            Input((args.time_steps, self.state_dim)),
+            Flatten(),
             Dense(128, activation='relu'),
             Dense(128, activation='relu'),
             Dense(self.action_dim)
@@ -51,8 +53,11 @@ class ActionValueModel:
         return self.model.predict(state)
 
     def get_action(self, state, training=True):
-        state = state.reshape(1, args.time_steps * self.state_dim)
-        self.eps *= self.eps_decay
+        global DECAY_COUNT
+
+        state = state.reshape(1, args.time_steps, self.state_dim)
+        if DECAY_COUNT % 10 == 0 and DECAY_COUNT > args.train_start:
+            self.eps *= self.eps_decay
         self.eps = max(self.eps_min, self.eps)
         eps = self.eps if training else 0.01
         q_value = self.model.predict(state)[0]
@@ -61,7 +66,7 @@ class ActionValueModel:
         return np.argmax(q_value)
     
     def train(self, state, target):
-        state = state.reshape(-1, args.time_steps * self.state_dim)
+        state = state.reshape(-1, args.time_steps, self.state_dim)
         with tf.GradientTape() as tape:
             logits = self.model(state, training=True)
             assert logits.shape == target.shape
@@ -85,7 +90,11 @@ class Agent:
         self.update_target_model()
     
     def update_target_model(self):
-        self.target_model.model.set_weights(self.model.model.get_weights())
+        weights = self.model.model.get_weights()
+        target_weights = self.target_model.model.get_weights()
+        for i in range(len(target_weights)):
+            target_weights[i] = weights[i] * args.tau + target_weights[i] * (1 - args.tau)
+        self.target_model.model.set_weights(target_weights)
 
     def update_states(self, next_state):
         self.stored_states = np.roll(self.stored_states, -1, axis=0)
@@ -103,20 +112,21 @@ class Agent:
         batch_target = []
         for sample in samples:
             state, action, reward, next_state, done = sample
-            batch_states.append(state.reshape(args.time_steps * self.state_dim))
-            state = state.reshape((1, args.time_steps * self.state_dim))
+            state = state.reshape(args.time_steps, self.state_dim)
+            batch_states.append(state.reshape(args.time_steps, self.state_dim))
+            state = state.reshape((1, args.time_steps, self.state_dim))
             target = self.target_model.predict(state)[0]
             train_reward = reward * 0.01
             
             if done:
                 target[action] = train_reward
             else:
-                next_state = next_state.reshape((1, args.time_steps * self.state_dim))
+                next_state = next_state.reshape((1, args.time_steps, self.state_dim))
                 next_q_value = max(self.target_model.predict(next_state)[0])
                 target[action] = train_reward + next_q_value * args.gamma
             batch_target.append(target)
-            self.model.train(np.array(batch_states), np.array(batch_target))
-            self.update_count = 0
+        self.model.train(np.array(batch_states), np.array(batch_target))
+        self.update_count = 0
      
     def train(self, max_episodes=1000):
         for ep in range(max_episodes):
@@ -129,7 +139,6 @@ class Agent:
                 action = self.model.get_action(self.stored_states)
                 next_state, reward, done, _ = self.env.step(action)
                 prev_stored_states = self.stored_states
-                self.update_states(next_state)
                 self.put_memory(prev_stored_states, action, reward, self.stored_states, done)
 
                 if len(self.memory) > args.train_start and args.update_interval < self.update_count:
