@@ -21,6 +21,8 @@
 - [TD3](#td3)
 - [SAC](#sac)
 
+<hr>
+
 <a name='dqn'></a>
 
 ### DQN
@@ -71,7 +73,10 @@ class ReplayBuffer:
 $ python DQN/DQN_Discrete.py
 ```
 
+<hr>
+
 <a name='drqn'></a>
+
 
 ### DRQN
 
@@ -85,7 +90,10 @@ $ python DQN/DQN_Discrete.py
 $ python DRQN/DRQN_Discrete.py
 ```
 
+<hr>
+
 <a name='double_dqn'></a>
+
 
 ### DoubleDQN
 
@@ -98,6 +106,8 @@ $ python DRQN/DRQN_Discrete.py
 # Discrete Action Space Double Deep Q-Learning
 $ python DoubleQN/DoubleDQN_Discrete.py
 ```
+
+<hr>
 
 <a name='dueling_dqn'></a>
 
@@ -112,6 +122,8 @@ $ python DoubleQN/DoubleDQN_Discrete.py
 # Discrete Action Space Dueling Deep Q-Learning
 $ python DuelingDQN/DuelingDQN_Discrete.py
 ```
+
+<hr>
 
 <a name='a2c'></a>
 
@@ -130,6 +142,8 @@ $ python A2C/A2C_Discrete.py
 $ python A2C/A2C_Continuous.py
 ```
 
+<hr>
+
 <a name='a3c'></a>
 
 ### A3C
@@ -146,6 +160,8 @@ $ python A3C/A3C_Discrete.py
 # Continuous Action Space Asyncronous Advantage Actor-Critic
 $ python A3C/A3C_Continuous.py
 ```
+
+<hr>
 
 <a name='ppo'></a>
 
@@ -164,6 +180,8 @@ $ python PPO/PPO_Discrete.py
 $ python PPO/PPO_Continuous.py
 ```
 
+<hr>
+
 <a name='trpo'></a>
 
 ### TRPO
@@ -176,6 +194,8 @@ $ python PPO/PPO_Continuous.py
 ```bash
 # NOTE: Not yet implemented!
 ```
+
+<hr>
 
 <a name='ddpg'></a>
 
@@ -190,6 +210,8 @@ $ python PPO/PPO_Continuous.py
 # NOTE: Not yet implemented!
 ```
 
+<hr>
+
 <a name='td3'></a>
 
 ### TD3
@@ -202,6 +224,8 @@ $ python PPO/PPO_Continuous.py
 ```bash
 # NOTE: Not yet implemented!
 ```
+
+<hr>
 
 <a name='sac'></a>
 
@@ -216,6 +240,8 @@ $ python PPO/PPO_Continuous.py
 ```bash
 # NOTE: Not yet implemented!
 ```
+
+<hr>
 
 ## Reference
 
