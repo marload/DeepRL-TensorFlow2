@@ -11,6 +11,21 @@
 
 ## Algorithms
 
+* [DQN](#dqn)
+* [DRQN](#drqn)
+* [DoubleDQN](#double_dqn)
+* [DuelingDQN](#dueling_dqn)
+* [A2C](#a2c)
+* [A3C](#a3c)
+* [PPO](#ppo)
+* [TRPO](#trpo)
+* [DDPG](#ddpg)
+* [TD3](#td3)
+* [SAC](#sac)
+
+
+<a name='dqn'></a>
+
 ### DQN
 **Paper** [Playing Atari with Deep Reinforcement Learning](https://arxiv.org/abs/1312.5602)<br>
 **Author** Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis Antonoglou, Daan Wierstra, Martin Riedmiller<br>
@@ -21,6 +36,8 @@
 # Discrete Action Space Deep Q-Learning
 $ python DQN/DQN_Discrete.py
 ```
+
+<a name='drqn'></a>
 
 ### DRQN
 **Paper** [Deep Recurrent Q-Learning for Partially Observable MDPs](https://arxiv.org/abs/1507.06527)<br>
@@ -33,6 +50,8 @@ $ python DQN/DQN_Discrete.py
 $ python DRQN/DRQN_Discrete.py
 ```
 
+<a name='double_dqn'></a>
+
 ### DoubleDQN
 **Paper** [Deep Reinforcement Learning with Double Q-learning](https://arxiv.org/abs/1509.06461)<br>
 **Author** Hado van Hasselt, Arthur Guez, David Silver<br>
@@ -44,6 +63,8 @@ $ python DRQN/DRQN_Discrete.py
 $ python DoubleQN/DoubleDQN_Discrete.py
 ```
 
+<a name='dueling_dqn'></a>
+
 ### DoubleDQN
 **Paper** [Dueling Network Architectures for Deep Reinforcement Learning](https://arxiv.org/abs/1511.06581)<br>
 **Author** Ziyu Wang, Tom Schaul, Matteo Hessel, Hado van Hasselt, Marc Lanctot, Nando de Freitas<br>
@@ -54,6 +75,8 @@ $ python DoubleQN/DoubleDQN_Discrete.py
 # Discrete Action Space Dueling Deep Q-Learning
 $ python DuelingDQN/DuelingDQN_Discrete.py
 ```
+
+<a name='a2c'></a>
 
 ### A2C
 **Paper** [Actor-Critic Algorithms](https://papers.nips.cc/paper/1786-actor-critic-algorithms.pdf)<br>
@@ -69,6 +92,8 @@ $ python A2C/A2C_Discrete.py
 $ python A2C/A2C_Continuous.py
 ```
 
+<a name='a3c'></a>
+
 ### A3C
 **Paper** [Asynchronous Methods for Deep Reinforcement Learning](https://arxiv.org/abs/1602.01783)<br>
 **Author** Volodymyr Mnih, Adrià Puigdomènech Badia, Mehdi Mirza, Alex Graves, Timothy P. Lillicrap, Tim Harley, David Silver, Koray Kavukcuoglu<br>
@@ -82,6 +107,8 @@ $ python A3C/A3C_Discrete.py
 # Continuous Action Space Asyncronous Advantage Actor-Critic
 $ python A3C/A3C_Continuous.py
 ```
+
+<a name='ppo'></a>
 
 ### PPO
 **Paper** [Proximal Policy Optimization](https://arxiv.org/abs/1707.06347)<br>
@@ -97,6 +124,8 @@ $ python PPO/PPO_Discrete.py
 $ python PPO/PPO_Continuous.py
 ```
 
+<a name='trpo'></a>
+
 ### TRPO
 **Paper** [Trust Region Policy Optimization](https://arxiv.org/abs/1502.05477)<br>
 **Author** John Schulman, Sergey Levine, Philipp Moritz, Michael I. Jordan, Pieter Abbeel<br>
@@ -106,6 +135,8 @@ $ python PPO/PPO_Continuous.py
 ```bash
 # NOTE: Not yet implemented!
 ```
+
+<a name='ddpg'></a>
 
 ### DDPG
 **Paper** [Continuous control with deep reinforcement learning](https://arxiv.org/abs/1509.02971)<br>
@@ -117,6 +148,8 @@ $ python PPO/PPO_Continuous.py
 # NOTE: Not yet implemented!
 ```
 
+<a name='td3'></a>
+
 ### TD3
 **Paper** [Addressing Function Approximation Error in Actor-Critic Methods](https://arxiv.org/abs/1802.09477)<br>
 **Author** Scott Fujimoto, Herke van Hoof, David Meger<br>
@@ -126,6 +159,8 @@ $ python PPO/PPO_Continuous.py
 ```bash
 # NOTE: Not yet implemented!
 ```
+
+<a name='sac'></a>
 
 ### SAC
 **Paper** [Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor
