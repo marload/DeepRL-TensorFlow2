@@ -29,7 +29,42 @@
 **Author** Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis Antonoglou, Daan Wierstra, Martin Riedmiller<br>
 **Method** OFF-Policy / Temporal-Diffrence / Model-Free<br>
 **Action** Discrete only<br>
+####Core of Idea
+```python
+# idea01. Approximate Q-Function using NeuralNetwork
+def create_model(self):
+    model = tf.keras.Sequential([
+        Input((self.state_dim,)),
+        Dense(32, activation='relu'),
+        Dense(16, activation='relu'),
+        Dense(self.action_dim)
+    ])
+    model.compile(loss='mse', optimizer=Adam(args.lr))
+    return model
 
+# idea02. Use target network
+self.target_model = ActionStateModel(self.state_dim, self.action_dim)
+
+# idea03. Use ReplayBuffer to increase data efficiency
+class ReplayBuffer:
+    def __init__(self, capacity=10000):
+        self.buffer = deque(maxlen=capacity)
+    
+    def put(self, state, action, reward, next_state, done):
+        self.buffer.append([state, action, reward, next_state, done])
+    
+    def sample(self):
+        sample = random.sample(self.buffer, args.batch_size)
+        states, actions, rewards, next_states, done = map(np.asarray, zip(*sample))
+        states = np.array(states).reshape(args.batch_size, -1)
+        next_states = np.array(next_states).reshape(args.batch_size, -1)
+        return states, actions, rewards, next_states, done
+    
+    def size(self):
+        return len(self.buffer)
+```
+
+#### Getting Start
 ```bash
 # Discrete Action Space Deep Q-Learning
 $ python DQN/DQN_Discrete.py
