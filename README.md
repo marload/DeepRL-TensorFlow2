@@ -177,7 +177,7 @@ $ python DuelingDQN/DuelingDQN_Discrete.py
 **Method** ON-Policy / Temporal-Diffrence / Model-Free<br>
 **Action** Discrete, Continuous<br>
 
-### Core of ideas
+#### Core of Ideas
 ```python
 # idea01. Use Advantage to reduce Variance
 def advatnage(self, td_targets, baselines):
@@ -204,6 +204,25 @@ $ python A2C/A2C_Continuous.py
 **Method** ON-Policy / Temporal-Diffrence / Model-Free<br>
 **Action** Discrete, Continuous<br>
 
+#### Core of Ideas
+```python
+# idea01. Reduce the correlation of data by running asynchronously multiple workers
+def train(self, max_episodes=1000):
+    workers = []
+
+    for i in range(self.num_workers):
+        env = gym.make(self.env_name)
+        workers.append(WorkerAgent(
+            env, self.global_actor, self.global_critic, max_episodes))
+
+    for worker in workers:
+        worker.start()
+
+    for worker in workers:
+        worker.join()
+```
+
+#### Getting Start
 ```bash
 # Discrete Action Space Asyncronous Advantage Actor-Critic
 $ python A3C/A3C_Discrete.py
