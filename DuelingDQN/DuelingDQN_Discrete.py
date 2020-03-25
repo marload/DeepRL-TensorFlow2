@@ -10,7 +10,7 @@ from collections import deque
 import random
 
 tf.keras.backend.set_floatx('float64')
-# wandb.init(name='DuelingDQN', project="deep-rl-tf2")
+wandb.init(name='DuelingDQN', project="deep-rl-tf2")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', type=float, default=0.95)
@@ -117,7 +117,7 @@ class Agent:
                 state = next_state
             self.target_update()
             print('EP{} EpisodeReward={}'.format(ep, total_reward))
-            # wandb.log({'Reward': total_reward})
+            wandb.log({'Reward': total_reward})
 
 
 def main():
