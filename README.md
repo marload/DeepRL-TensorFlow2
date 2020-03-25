@@ -115,6 +115,15 @@ $ python DRQN/DRQN_Discrete.py
 **Method** OFF-Policy / Temporal-Diffrence / Model-Free<br>
 **Action** Discrete only<br>
 
+#### Core of Ideas
+```python
+# idea01. Resolved the issue of 'overestimate' in Q Learning
+on_action = np.argmax(self.model.predict(next_states), axis=1)
+next_q_values = self.target_model.predict(next_states)[range(args.batch_size), on_action]
+targets[range(args.batch_size), actions] = rewards + (1-done) * next_q_values * args.gamma
+```
+
+#### Getting Start
 ```bash
 # Discrete Action Space Double Deep Q-Learning
 $ python DoubleQN/DoubleDQN_Discrete.py
