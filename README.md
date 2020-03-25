@@ -140,6 +140,27 @@ $ python DoubleQN/DoubleDQN_Discrete.py
 **Method** OFF-Policy / Temporal-Diffrence / Model-Free<br>
 **Action** Discrete only<br>
 
+#### Core of Ideas
+```python
+# idea01. Q-Function has been separated into Value Function and Advantage Function
+def create_model(self):
+    backbone = tf.keras.Sequential([
+        Input((self.state_dim,)),
+        Dense(32, activation='relu'),
+        Dense(16, activation='relu')
+    ])
+    state_input = Input((self.state_dim,))
+    backbone_1 = Dense(32, activation='relu')(state_input)
+    backbone_2 = Dense(16, activation='relu')(backbone_1)
+    value_output = Dense(1)(backbone_2)
+    advantage_output = Dense(self.action_dim)(backbone_2)
+    output = Add()([value_output, advantage_output])
+    model = tf.keras.Model(state_input, output)
+    model.compile(loss='mse', optimizer=Adam(args.lr))
+    return model
+```
+
+#### Gettting Start
 ```bash
 # Discrete Action Space Dueling Deep Q-Learning
 $ python DuelingDQN/DuelingDQN_Discrete.py
