@@ -19,7 +19,7 @@ This repository uses [TensorFlow2](https://github.com/tensorflow/tensorflow) to 
 | Paper  |                 [Playing Atari with Deep Reinforcement Learning](https://arxiv.org/abs/1312.5602)                  |
 | Author | Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis Antonoglou, Daan Wierstra, Martin Riedmiller |
 | Method |                                          Temporal Diffrence / Off-Policy                                           |
-| Action |                                      [Discrete](./DQN/dqn_discrete_action.py)                                      |
+| Action |                                      [Discrete](./DQN/DQN_Discrete.py)                                      |
 
 ### DRQN
 
@@ -28,7 +28,7 @@ This repository uses [TensorFlow2](https://github.com/tensorflow/tensorflow) to 
 | Paper  | [Deep Recurrent Q-Learning for Partially Observable MDPs](https://arxiv.org/abs/1507.06527) |
 | Author |                               Matthew Hausknecht, Peter Stone                               |
 | Method |                               Temporal Diffrence / Off-Policy                               |
-| Action |                         [Discrete](./DRQN/drqn_discrete_action.py)                          |
+| Action |                         [Discrete](./DRQN/DRQN_Discrete.py)                          |
 
 ### A2C
 
@@ -37,7 +37,7 @@ This repository uses [TensorFlow2](https://github.com/tensorflow/tensorflow) to 
 | Paper  | [Actor-Critic Algorithms](https://papers.nips.cc/paper/1786-actor-critic-algorithms.pdf) |
 | Author |                            Vijay R. Konda, John N. Tsitsiklis                            |
 | Method |                              Temporal Diffrence / On-Policy                              |
-| Action | [Discrete](./A2C/a2c_discrete_action.py) / [Continuous](./A2C/a2c_continuous_action.py)  |
+| Action | [Discrete](./A2C/A2C_Discrete.py) / [Continuous](./A2C/A2C_Continuous.py)  |
 
 ### A3C
 
@@ -46,7 +46,7 @@ This repository uses [TensorFlow2](https://github.com/tensorflow/tensorflow) to 
 | Paper  |                       [Asynchronous Methods for Deep Reinforcement Learning](https://arxiv.org/abs/1602.01783)                        |
 | Author | Volodymyr Mnih, Adrià Puigdomènech Badia, Mehdi Mirza, Alex Graves, Timothy P. Lillicrap, Tim Harley, David Silver, Koray Kavukcuoglu |
 | Method |                                                    Temporal Diffrence / On-Policy                                                     |
-| Action |                        [Discrete](./A3C/a3c_discrete_action.py) / [Continuous](./A3C/a3c_continuous_action.py)                        |
+| Action |                        [Discrete](./A3C/A3C_Discrete.py) / [Continuous](./A3C/A3C_Continuous.py)                        |
 
 ### PPO
 
@@ -55,28 +55,20 @@ This repository uses [TensorFlow2](https://github.com/tensorflow/tensorflow) to 
 | Paper  |            [Proximal Policy Optimization](https://arxiv.org/abs/1707.06347)             |
 | Author |        John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, Oleg Klimov        |
 | Method |                             Temporal Diffrence / On-Policy                              |
-| Action | [Discrete](./PPO/ppo_discrete_action.py) / [Continuous](./PPO/ppo_continuous_action.py) |
+| Action | [Discrete](./PPO/PPO_Discrete.py) / [Continuous](./PPO/PPO_Continuous.py) |
 
 ### Comming Soon...
 
 ## Usage
-
-Discrete Action Space Asyncronous Advantage Actor-Critic
-
 ```
-$ python A3C/a3c_discrete_action.py
-```
+// Discrete Action Space A3C
+$ python A3C/A3C_Discrete.py
 
-Deep Q-Learning
+// Discrete Action Space DQN
+$ python DQN/DQN_Discrete.py
 
-```
-$ python DQN/dqn_discrete_action.py
-```
-
-Continuous Action Space Proximal Policy Optimization
-
-```
-$ python PPO/ppo_continuous_action.py
+// Continuous Action Space PPO
+$ python PPO/PPO_Continuous.py
 ```
 
 ## Papers
