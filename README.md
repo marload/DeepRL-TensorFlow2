@@ -220,6 +220,9 @@ def train(self, max_episodes=1000):
 
     for worker in workers:
         worker.join()
+
+# idea02. Improves exploration through entropy loss
+entropy_loss = tf.keras.losses.CategoricalCrossentropy(from_logits=True)
 ```
 
 #### Getting Start
@@ -242,6 +245,25 @@ $ python A3C/A3C_Continuous.py
 **Method** ON-Policy / Temporal-Diffrence / Model-Free<br>
 **Action** Discrete, Continuous<br>
 
+### Core of ideas
+```python
+# idea01. Use Importance Sampling to act like an Off-Policy algorithm
+# idea02. Use clip to prevent rapid changes in parameters.
+def compute_loss(self, old_policy, new_policy, actions, gaes):
+    gaes = tf.stop_gradient(gaes)
+    old_log_p = tf.math.log(
+        tf.reduce_sum(old_policy * actions))
+    old_log_p = tf.stop_gradient(old_log_p)
+    log_p = tf.math.log(tf.reduce_sum(
+        new_policy * actions))
+    ratio = tf.math.exp(log_p - old_log_p)
+    clipped_ratio = tf.clip_by_value(
+        ratio, 1 - args.clip_ratio, 1 + args.clip_ratio)
+    surrogate = -tf.minimum(ratio * gaes, clipped_ratio * gaes)
+    return tf.reduce_mean(surrogate)
+```
+
+### Getting Start
 ```bash
 # Discrete Action Space Proximal Policy Optimization
 $ python PPO/PPO_Discrete.py
