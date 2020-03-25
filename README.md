@@ -87,7 +87,7 @@ $ python DQN/DQN_Discrete.py
 
 #### Core of Ideas
 ```python
-# idea01. LSTM layer를 사용하여 이전의 state가 feature로써 사용함
+# idea01. Previous state uses LSTM layer as feature
 def create_model(self):
     return tf.keras.Sequential([
         Input((args.time_steps, self.state_dim)),
