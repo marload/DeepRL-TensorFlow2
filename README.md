@@ -29,7 +29,8 @@
 **Author** Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis Antonoglou, Daan Wierstra, Martin Riedmiller<br>
 **Method** OFF-Policy / Temporal-Diffrence / Model-Free<br>
 **Action** Discrete only<br>
-####Core of Idea
+
+#### Core of Idea
 ```python
 # idea01. Approximate Q-Function using NeuralNetwork
 def create_model(self):
@@ -44,7 +45,7 @@ def create_model(self):
 
 # idea02. Use target network
 self.target_model = ActionStateModel(self.state_dim, self.action_dim)
-
+ 
 # idea03. Use ReplayBuffer to increase data efficiency
 class ReplayBuffer:
     def __init__(self, capacity=10000):
