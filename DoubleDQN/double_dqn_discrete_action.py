@@ -10,7 +10,7 @@ from collections import deque
 import random
 
 tf.keras.backend.set_floatx('float64')
-wandb.init(name='DQN', project="deep-rl-tf2")
+wandb.init(name='DoubleDQN', project="deep-rl-tf2")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', type=float, default=0.95)
@@ -92,7 +92,7 @@ class Agent:
     def replay(self):
         states, actions, rewards, next_states, done = self.buffer.sample()
         targets = self.target_model.predict(states)
-        next_q_values = self.target_model.predict(next_states).max(axis=1)
+        next_q_values = self.target_model.predict(next_states)[range(args.batch_size),np.argmax(self.model.predict(next_states), axis=1)]
         targets[range(args.batch_size), actions] = rewards + (1-done) * next_q_values * args.gamma
         self.model.train(states, targets)
     
