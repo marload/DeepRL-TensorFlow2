@@ -9,71 +9,96 @@
 
 [deep-rl-tf2](https://github.com/marload/deep-rl-tf2) is a repository that implements a variety of popular Deep Reinforcement Learning algorithms using [TensorFlow2](https://tensorflow.org). The key to this repository is an easy-to-understand code. Therefore, if you are a student or a researcher studying Deep Reinforcement Learning, I think it would be the **best choice to study** with this repository. One algorithm relies only on one python script file. So you don't have to go in and out of different files to study specific algorithms. This repository is constantly being updated and will continue to add a new Deep Reinforcement Learning algorithm.
 
-
-|     ENV     |                   Value-Based                    |                 Policy Gradient                  |
-| :---------: | :----------------------------------------------: | :----------------------------------------------: |
-| CartPole-v1 | ![cartpole](./assets/vb_cartpole-v1.png) | ![pendulum](./assets/pg_cartpole-v1.png) |
-
 ## Algorithms
 
 ### DQN
+**Paper** [Playing Atari with Deep Reinforcement Learning](https://arxiv.org/abs/1312.5602)
+**Author** Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis Antonoglou, Daan Wierstra, Martin Riedmiller
+**Method** OFF-Policy / Temporal-Diffrence / Model-Free
+**Action** Discrete only
 
-|  Name  |                                                  Deep Q-Learning                                                   |
-| :----: | :----------------------------------------------------------------------------------------------------------------: |
-| Paper  |                 [Playing Atari with Deep Reinforcement Learning](https://arxiv.org/abs/1312.5602)                  |
-| Author | Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis Antonoglou, Daan Wierstra, Martin Riedmiller |
-| Method |                                          Temporal Diffrence / Off-Policy                                           |
-| Action |                                         [Discrete](./DQN/DQN_Discrete.py)                                          |
+```bash
+# Discrete Action Space Deep Q-Learning
+$ python DQN/DQN_Discrete.py
+```
 
 ### DRQN
+**Paper** [Deep Recurrent Q-Learning for Partially Observable MDPs](https://arxiv.org/abs/1507.06527)
+**Author** Matthew Hausknecht, Peter Stone
+**Method** OFF-Policy / Temporal-Diffrence / Model-Free
+**Action** Discrete only
 
-|  Name  |                                  Deep Recurrent Q-Learning                                  |
-| :----: | :-----------------------------------------------------------------------------------------: |
-| Paper  | [Deep Recurrent Q-Learning for Partially Observable MDPs](https://arxiv.org/abs/1507.06527) |
-| Author |                               Matthew Hausknecht, Peter Stone                               |
-| Method |                               Temporal Diffrence / Off-Policy                               |
-| Action |                             [Discrete](./DRQN/DRQN_Discrete.py)                             |
+```bash
+# Discrete Action Space Deep Recurrent Q-Learning
+$ python DRQN/DRQN_Discrete.py
+```
+
+### DoubleDQN
+**Paper** [Deep Reinforcement Learning with Double Q-learning](https://arxiv.org/abs/1509.06461)
+**Author** Hado van Hasselt, Arthur Guez, David Silver
+**Method** OFF-Policy / Temporal-Diffrence / Model-Free
+**Action** Discrete only
+
+```bash
+# Discrete Action Space Double Deep Q-Learning
+$ python DoubleQN/DoubleDQN_Discrete.py
+```
+
+### DoubleDQN
+**Paper** [Dueling Network Architectures for Deep Reinforcement Learning](https://arxiv.org/abs/1511.06581)
+**Author** Ziyu Wang, Tom Schaul, Matteo Hessel, Hado van Hasselt, Marc Lanctot, Nando de Freitas
+**Method** OFF-Policy / Temporal-Diffrence / Model-Free
+**Action** Discrete only
+
+```bash
+# Discrete Action Space Dueling Deep Q-Learning
+$ python DuelingDQN/DuelingDQN_Discrete.py
+```
 
 ### A2C
+**Paper** [Actor-Critic Algorithms](https://papers.nips.cc/paper/1786-actor-critic-algorithms.pdf)
+**Author** Vijay R. Konda, John N. Tsitsiklis
+**Method** ON-Policy / Temporal-Diffrence / Model-Free
+**Action** Discrete, Continuous
 
-|  Name  |                                  Advantage Actor-Critic                                  |
-| :----: | :--------------------------------------------------------------------------------------: |
-| Paper  | [Actor-Critic Algorithms](https://papers.nips.cc/paper/1786-actor-critic-algorithms.pdf) |
-| Author |                            Vijay R. Konda, John N. Tsitsiklis                            |
-| Method |                              Temporal Diffrence / On-Policy                              |
-| Action |        [Discrete](./A2C/A2C_Discrete.py) / [Continuous](./A2C/A2C_Continuous.py)         |
+```bash
+# Discrete Action Space Advantage Actor-Critic
+$ python A2C/A2C_Discrete.py
+
+# Continuous Action Space Advantage Actor-Critic
+$ python A2C/A2C_Continuous.py
+```
 
 ### A3C
+**Paper** [Asynchronous Methods for Deep Reinforcement Learning](https://arxiv.org/abs/1602.01783)
+**Author** Volodymyr Mnih, Adrià Puigdomènech Badia, Mehdi Mirza, Alex Graves, Timothy P. Lillicrap, Tim Harley, David Silver, Koray Kavukcuoglu
+**Method** ON-Policy / Temporal-Diffrence / Model-Free
+**Action** Discrete, Continuous
 
-|  Name  |                                                  Asyncronous Advantage Actor-Critic                                                   |
-| :----: | :-----------------------------------------------------------------------------------------------------------------------------------: |
-| Paper  |                       [Asynchronous Methods for Deep Reinforcement Learning](https://arxiv.org/abs/1602.01783)                        |
-| Author | Volodymyr Mnih, Adrià Puigdomènech Badia, Mehdi Mirza, Alex Graves, Timothy P. Lillicrap, Tim Harley, David Silver, Koray Kavukcuoglu |
-| Method |                                                    Temporal Diffrence / On-Policy                                                     |
-| Action |                               [Discrete](./A3C/A3C_Discrete.py) / [Continuous](./A3C/A3C_Continuous.py)                               |
+```bash
+# Discrete Action Space Asyncronous Advantage Actor-Critic
+$ python A3C/A3C_Discrete.py
+
+# Continuous Action Space Asyncronous Advantage Actor-Critic
+$ python A3C/A3C_Continuous.py
+```
 
 ### PPO
+**Paper** [Proximal Policy Optimization](https://arxiv.org/abs/1707.06347)
+**Author** John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, Oleg Klimov
+**Method** ON-Policy / Temporal-Diffrence / Model-Free
+**Action** Discrete, Continuous
 
-|  Name  |                       Proximal Policy Optimization                        |
-| :----: | :-----------------------------------------------------------------------: |
-| Paper  |     [Proximal Policy Optimization](https://arxiv.org/abs/1707.06347)      |
-| Author | John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, Oleg Klimov |
-| Method |                      Temporal Diffrence / On-Policy                       |
-| Action | [Discrete](./PPO/PPO_Discrete.py) / [Continuous](./PPO/PPO_Continuous.py) |
+```bash
+# Discrete Action Space Proximal Policy Optimization
+$ python PPO/PPO_Discrete.py
+
+# Continuous Action Space Proximal Policy Optimization
+$ python PPO/PPO_Continuous.py
+```
 
 ### Comming Soon...
 
-## Usage
-```
-// Discrete Action Space A3C
-$ python A3C/A3C_Discrete.py
-
-// Discrete Action Space DQN
-$ python DQN/DQN_Discrete.py
-
-// Continuous Action Space PPO
-$ python PPO/PPO_Continuous.py
-```
 
 ## Papers
 
