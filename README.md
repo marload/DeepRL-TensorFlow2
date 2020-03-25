@@ -85,6 +85,19 @@ $ python DQN/DQN_Discrete.py
 **Method** OFF-Policy / Temporal-Diffrence / Model-Free<br>
 **Action** Discrete only<br>
 
+#### Core of Ideas
+```python
+# idea01. LSTM layer를 사용하여 이전의 state가 feature로써 사용함
+def create_model(self):
+    return tf.keras.Sequential([
+        Input((args.time_steps, self.state_dim)),
+        LSTM(32, activation='tanh'),
+        Dense(16, activation='relu'),
+        Dense(self.action_dim)
+    ])
+```
+
+#### Getting Start
 ```bash
 # Discrete Action Space Deep Recurrent Q-Learning
 $ python DRQN/DRQN_Discrete.py
