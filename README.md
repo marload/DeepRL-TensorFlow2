@@ -1,9 +1,12 @@
 
 
-![logo](./assets/logo.png)
-
 ![TF Depend](https://img.shields.io/badge/TensorFlow-2.1-orange) ![GYM Depend](https://img.shields.io/badge/openai%2Fgym-0.17.1-blue) ![License Badge](https://img.shields.io/badge/license-Apache%202-green)<br>
-Deep-rl-tf2 is a repository that implements a variety of popular Deep Reinforcement Learning algorithms using TensorFlow2. The key to this repository is an easy-to-understand code. Therefore, if you are a student or a researcher studying Deep Reinforcement Learning, I think it would be the best choice to study with this repository. One algorithm relies only on one python script file. So you don't have to go in and out of different files to study specific algorithms. This repository is constantly being updated and will continue to add a new Deep Reinforcement Learning algorithm.
+
+<p align="center">
+  <img width="150" src="./assets/logo.png">
+</p>
+<h2 align=center>Deep Reinforcement Learning in TensorFlow2</h2>
+`deep-rl-tf2` is a repository that implements a variety of popular Deep Reinforcement Learning algorithms using TensorFlow2. The key to this repository is an easy-to-understand code. Therefore, if you are a student or a researcher studying Deep Reinforcement Learning, I think it would be the best choice to study with this repository. One algorithm relies only on one python script file. So you don't have to go in and out of different files to study specific algorithms. This repository is constantly being updated and will continue to add a new Deep Reinforcement Learning algorithm.
 
 
 |     ENV     |                   Value-Based                    |                 Policy Gradient                  |
