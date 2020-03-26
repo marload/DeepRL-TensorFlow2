@@ -19,7 +19,6 @@ parser.add_argument('--critic_lr', type=float, default=0.001)
 args = parser.parse_args()
 
 CUR_EPISODE = 0
-A
 
 class Actor:
     def __init__(self, state_dim, action_dim, action_bound, std_bound):
