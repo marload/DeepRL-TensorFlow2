@@ -100,9 +100,7 @@ class Agent:
         self.action_dim = self.env.action_space.shape[0]
         self.action_bound = self.env.action_space.high[0]
         self.std_bound = [1e-2, 1.0]
-
-        self.actor_opt = tf.keras.optimizers.Adam(args.actor_lr)
-        self.critic_opt = tf.keras.optimizers.Adam(args.critic_lr)
+        
         self.actor = Actor(self.state_dim, self.action_dim,
                            self.action_bound, self.std_bound)
         self.critic = Critic(self.state_dim)
