@@ -298,8 +298,26 @@ $ python PPO/PPO_Continuous.py
 **Method** OFF-Policy / Temporal-Diffrence / Model-Free<br>
 **Action** Continuous<br>
 
+#### Core of ideas
+```python
+# idea01. Use deterministic Actor Model
+def create_model(self):
+    return tf.keras.Sequential([
+        Input((self.state_dim,)),
+        Dense(32, activation='relu'),
+        Dense(32, activation='relu'),
+        Dense(self.action_dim, activation='tanh'),
+        Lambda(lambda x: x * self.action_bound)
+    ])
+
+# idea02. Add noise to Action
+action = np.clip(action + noise, -self.action_bound, self.action_bound)
+```
+
+#### Getting Start
 ```bash
-# NOTE: Not yet implemented!
+# Continuous Action Space Proximal Policy Optimization
+$ python DDPG/DDPG_Continuous.py
 ```
 
 <hr>
