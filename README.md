@@ -7,6 +7,10 @@
 
 [deep-rl-tf2](https://github.com/marload/deep-rl-tf2) is a repository that implements a variety of popular Deep Reinforcement Learning algorithms using [TensorFlow2](https://tensorflow.org). The key to this repository is an easy-to-understand code. Therefore, if you are a student or a researcher studying Deep Reinforcement Learning, I think it would be the **best choice to study** with this repository. One algorithm relies only on one python script file. So you don't have to go in and out of different files to study specific algorithms. This repository is constantly being updated and will continue to add a new Deep Reinforcement Learning algorithm.
 
+<p align="center">
+  <img width="350" src="./assets/cartpolev1.svg">
+</p>
+
 ## Algorithms
 
 - [DQN](#dqn)
