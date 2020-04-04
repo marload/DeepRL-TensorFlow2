@@ -138,7 +138,7 @@ $ python DoubleQN/DoubleDQN_Discrete.py
 
 <a name='dueling_dqn'></a>
 
-### DoubleDQN
+### DuelingDQN
 
 **Paper** [Dueling Network Architectures for Deep Reinforcement Learning](https://arxiv.org/abs/1511.06581)<br>
 **Author** Ziyu Wang, Tom Schaul, Matteo Hessel, Hado van Hasselt, Marc Lanctot, Nando de Freitas<br>
