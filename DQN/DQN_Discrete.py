@@ -1,6 +1,6 @@
 import wandb
 import tensorflow as tf
-from tensorflow.keras.layers import Input, Dense, Flatten, Lambda
+from tensorflow.keras.layers import Input, Dense
 from tensorflow.keras.optimizers import Adam
 
 import gym
