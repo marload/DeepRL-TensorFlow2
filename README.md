@@ -279,21 +279,6 @@ $ python PPO/PPO_Continuous.py
 
 <hr>
 
-<a name='trpo'></a>
-
-### TRPO
-
-**Paper** [Trust Region Policy Optimization](https://arxiv.org/abs/1502.05477)<br>
-**Author** John Schulman, Sergey Levine, Philipp Moritz, Michael I. Jordan, Pieter Abbeel<br>
-**Method** OFF-Policy / Temporal-Diffrence / Model-Free<br>
-**Action** Discrete, Continuous<br>
-
-```bash
-# NOTE: Not yet implemented!
-```
-
-<hr>
-
 <a name='ddpg'></a>
 
 ### DDPG
@@ -323,6 +308,21 @@ action = np.clip(action + noise, -self.action_bound, self.action_bound)
 ```bash
 # Continuous Action Space Proximal Policy Optimization
 $ python DDPG/DDPG_Continuous.py
+```
+
+<hr>
+
+<a name='trpo'></a>
+
+### TRPO
+
+**Paper** [Trust Region Policy Optimization](https://arxiv.org/abs/1502.05477)<br>
+**Author** John Schulman, Sergey Levine, Philipp Moritz, Michael I. Jordan, Pieter Abbeel<br>
+**Method** OFF-Policy / Temporal-Diffrence / Model-Free<br>
+**Action** Discrete, Continuous<br>
+
+```bash
+# NOTE: Not yet implemented!
 ```
 
 <hr>
