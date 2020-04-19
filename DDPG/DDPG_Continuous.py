@@ -78,7 +78,7 @@ class Critic:
 
     def create_model(self):
         state_input = Input((self.state_dim,))
-        s1 = Dense(32, activation='relu')(state_input)
+        s1 = Dense(64, activation='relu')(state_input)
         s2 = Dense(32, activation='relu')(s1)
         action_input = Input((self.action_dim,))
         a1 = Dense(32, activation='relu')(action_input)
