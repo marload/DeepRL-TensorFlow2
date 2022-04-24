@@ -16,6 +16,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', type=float, default=0.95)
 parser.add_argument('--lr', type=float, default=0.005)
 parser.add_argument('--batch_size', type=int, default=32)
+parser.add_argument('--episode', type=int, default=32)
+parser.add_argument('--replay_batch', type=int, default=10)
 parser.add_argument('--eps', type=float, default=1.0)
 parser.add_argument('--eps_decay', type=float, default=0.995)
 parser.add_argument('--eps_min', type=float, default=0.01)
@@ -41,7 +43,7 @@ class ReplayBuffer:
     return len(self.buffer)
 
 
-class ActionStateModel:
+class QualityModel:
   def __init__(self, state_dim, aciton_dim):
     self.state_dim = state_dim
     self.action_dim = aciton_dim
@@ -81,8 +83,8 @@ class Agent:
     self.state_dim = self.env.observation_space.shape[0]
     self.action_dim = self.env.action_space.n
 
-    self.model = ActionStateModel(self.state_dim, self.action_dim)
-    self.target_model = ActionStateModel(self.state_dim, self.action_dim)
+    self.model = QualityModel(self.state_dim, self.action_dim)
+    self.target_model = QualityModel(self.state_dim, self.action_dim)
     self.target_update()
 
     self.buffer = ReplayBuffer()
@@ -92,15 +94,15 @@ class Agent:
     self.target_model.model.set_weights(weights)
 
   def replay(self):
-    for _ in range(10):
+    for _ in range(args.replay_batch):
       states, actions, rewards, next_states, done = self.buffer.sample()
       targets = self.target_model.predict(states)
       next_q_values = self.target_model.predict(next_states)[:, np.argmax(self.model.predict(next_states), axis=1)]
       targets[:, actions] = rewards + (1 - done) * next_q_values * args.gamma
       self.model.train(states, targets)
 
-  def train(self, max_episodes=1000):
-    for ep in range(max_episodes):
+  def train(self):
+    for ep in range(args.episode):
       done, total_reward = False, 0
       state = self.env.reset()
       while not done:
@@ -120,7 +122,7 @@ class Agent:
 def main():
   env = gym.make('CartPole-v1')
   agent = Agent(env)
-  agent.train(max_episodes=1000)
+  agent.train()
 
 
 if __name__ == "__main__":
