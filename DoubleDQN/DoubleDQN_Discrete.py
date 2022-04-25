@@ -62,7 +62,7 @@ class QualityModel:
       Input((self.state_dim,)),
       Dense(32, activation='relu'),
       Dense(16, activation='relu'),
-      Dense(self.action_dim, activation="softmax")
+      Dense(self.action_dim)
     ])
     model.compile(loss='mse', optimizer=Adam(args.lr))
     return model
