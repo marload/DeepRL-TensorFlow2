@@ -16,6 +16,8 @@ parser.add_argument('--lr', type=float, default=0.005)
 parser.add_argument('--batch_size', type=int, default=32)
 parser.add_argument('--episode', type=int, default=32)
 parser.add_argument('--replay_batch', type=int, default=10)
+parser.add_argument('--sample_method', type=str, default="recent")
+parser.add_argument('--train_policy', type=str, default="off-policy")
 parser.add_argument('--eps', type=float, default=0.9)
 parser.add_argument('--eps_decay', type=float, default=0.995)
 parser.add_argument('--eps_min', type=float, default=0.01)
@@ -24,9 +26,9 @@ args = parser.parse_args()
 
 
 class ReplayBuffer:
-  def __init__(self, capacity=64, sample_policy='recent'):
+  def __init__(self, capacity=64):
     self.buffer = deque(maxlen=capacity)
-    self.sample_policy = sample_policy
+    self.sample_policy = args.sample_method
 
   def put(self, state, action, reward, next_state, done):
     self.buffer.append([state, action, reward, next_state, done])
@@ -110,6 +112,27 @@ class Agent:
       self.model.train(states, targets)
 
   def train(self):
+    if args.train_policy == "on-policy":
+      self.train_onpolicy()
+    elif args.train_policy == "off-policy":
+      self.train_offpolicy()
+
+  def train_offpolicy(self):
+    for ep in range(args.episode):
+      for _ in range(args.batch_size):
+        state = self.env.rand_state()
+        action = random.choice(range(self.action_dim))
+        next_state, reward, done = self.env.action(action)
+        self.buffer.put(state, action, reward, next_state, done)
+      self.replay()
+      self.target_update()
+
+      print(f'Episode {ep}, action rewards:')
+      for rob, s in self.env.iter_states():
+        act = self.model.get_action(s)
+        print(f'      at {rob}, action = {act}')
+
+  def train_onpolicy(self):
     for ep in range(args.episode):
       done, total_reward = False, 0
       state = self.env.reset()

@@ -2,6 +2,7 @@ import numpy as np
 import random
 import sys
 
+
 class Maze:
   DEST_SYM = 10
   ROAD_SYM = 1
@@ -12,6 +13,7 @@ class Maze:
   NEU_REWARD = 0
   POS_REWARD = 1
   WIN_REWARD = 2
+
   def __init__(self, size):
     self._step = 0
     self._size = size
@@ -39,18 +41,18 @@ class Maze:
     self._maze = maze
     return maze.reshape(1, -1)
 
-  def rand_act(self):
-    x = random.sample(range(self._size), 1)
-    y = random.sample(range(self._size), 1)
+  def rand_state(self):
+    x = random.choice(range(self._size))
+    y = random.choice(range(self._size))
     if self._orig_maze[x, y] == Maze.BLK_SYM:
-      return self.rand_act()
+      return self.rand_state()
     self._maze[self._robot[0], self._robot[1]] = Maze.ROAD_SYM
-    self._robot = [x, y]
+    self._robot = np.asarray([x, y])
     self._maze[self._robot[0], self._robot[1]] = Maze.ROB_SYM
     return self._maze.reshape(1, -1)
 
   def state_dim(self):
-    return self._size**2
+    return self._size ** 2
 
   def action_dim(self):
     return 4
@@ -58,16 +60,18 @@ class Maze:
   # return next_state, reward, done
   def action(self, a):
     self._maze[self._robot[0], self._robot[1]] = Maze.ROAD_SYM
-    if a == 0: # left
+    orig_rob = self._robot.copy()
+    if a == 0:  # left
       self._robot[1] -= 1
-    if a == 1: # right
+    if a == 1:  # right
       self._robot[1] += 1
-    if a == 2: # down
+    if a == 2:  # down
       self._robot[0] += 1
-    if a == 3: # up
+    if a == 3:  # up
       self._robot[0] -= 1
     if (self._robot < 0).any() or (self._robot >= self._size).any():
       print(f"action = {a}, robot = {self._robot}, fallout of boarder ...")
+      self._robot = orig_rob
       return self._maze.reshape(1, -1), Maze.FAIL_REWARD, True
 
     s = self._maze[self._robot[0], self._robot[1]]
@@ -75,6 +79,7 @@ class Maze:
     r = Maze.NEU_REWARD
     if s == Maze.BLK_SYM:
       print(f"action = {a}, robot = {self._robot}, fall into trap ...")
+      self._robot = orig_rob
       r = Maze.FAIL_REWARD
     elif s == Maze.ROAD_SYM:
       r = Maze.NEU_REWARD
@@ -88,14 +93,27 @@ class Maze:
   def print(self):
     maze = self._maze
     for i in range(self._size):
-      line = " | ".join(f"{x:2d}" if x != Maze.ROB_SYM else f" *" for x in maze[i,:])
+      line = " | ".join(f"{x:2d}" if x != Maze.ROB_SYM else f" *" for x in maze[i, :])
       print(f"{line}\n")
-      print("_"*len(line)+"\n")
-    print("*"*len(line)+"\n")
+      print("_" * len(line) + "\n")
+    print("*" * len(line) + "\n")
+
+  def iter_states(self):
+    self._maze[self._robot[0], self._robot[1]] = Maze.ROAD_SYM
+    for x in range(self._size):
+      for y in range(self._size):
+        self._robot = np.array([x, y])
+        if self._maze[self._robot[0], self._robot[1]] == Maze.BLK_SYM \
+          or self._maze[self._robot[0], self._robot[1]] == Maze.DEST_SYM:
+            continue
+        self._maze[self._robot[0], self._robot[1]] = Maze.ROB_SYM
+        yield (x,y), self._maze.reshape(1, -1)
+        self._maze[self._robot[0], self._robot[1]] = Maze.ROAD_SYM
 
 
 if __name__ == "__main__":
   import time
+
   maze = Maze(3)
   maze.reset()
   maze.print()
@@ -112,5 +130,5 @@ if __name__ == "__main__":
   maze.action(3)
   maze.print()
 
-
-
+  for m in maze.iter_states():
+    print (m)
