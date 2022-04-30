@@ -31,25 +31,44 @@ class Maze:
     self._maze[-1, -1] = Maze.DEST_SYM
     self._orig_maze = self._maze.copy()
     self._robot = np.zeros(shape=(2,), dtype=np.int)
+    self.place_rob(self._robot)
+
+  def place_rob(self, loc):
+    # robot must at road
+    if (loc < 0).any() or (loc >= self._size).any():
+      print(f"out of bound at {loc}")
+      return Maze.FAIL_REWARD
+    if self._maze[loc[0], loc[1]] == Maze.BLK_SYM:
+      print(f"game over: {loc}")
+      return Maze.FAIL_REWARD
+    if self._maze[loc[0], loc[1]] == Maze.DEST_SYM:
+      print(f"game WIN: {loc}")
+      return Maze.WIN_REWARD
+
+    self._maze[self._robot[0], self._robot[1]] = Maze.ROAD_SYM
+    self._maze[loc[0], loc[1]] = Maze.ROB_SYM
+    self._robot = loc
+    return Maze.NEU_REWARD
 
   # return state
   def reset(self):
     self._step = 0
     self._robot = np.zeros(shape=(2,), dtype=np.int)
     maze = self._orig_maze.copy()
-    maze[self._robot[0], self._robot[1]] = Maze.ROB_SYM
     self._maze = maze
+    self.place_rob(self._robot)
     return maze.reshape(1, -1)
+
+  def get_state(self):
+    return self._maze.copy().reshape(1, -1)
 
   def rand_state(self):
     x = random.choice(range(self._size))
     y = random.choice(range(self._size))
-    if self._orig_maze[x, y] == Maze.BLK_SYM:
+    if self.place_rob(np.array([x, y])) != Maze.NEU_REWARD:
       return self.rand_state()
-    self._maze[self._robot[0], self._robot[1]] = Maze.ROAD_SYM
-    self._robot = np.asarray([x, y])
-    self._maze[self._robot[0], self._robot[1]] = Maze.ROB_SYM
-    return self._maze.reshape(1, -1)
+    else:
+      return self.get_state()
 
   def state_dim(self):
     return self._size ** 2
@@ -59,36 +78,20 @@ class Maze:
 
   # return next_state, reward, done
   def action(self, a):
-    self._maze[self._robot[0], self._robot[1]] = Maze.ROAD_SYM
-    orig_rob = self._robot.copy()
+    new_rob_loc = self._robot.copy()
     if a == 0:  # left
-      self._robot[1] -= 1
+      new_rob_loc[1] -= 1
     if a == 1:  # right
-      self._robot[1] += 1
+      new_rob_loc[1] += 1
     if a == 2:  # down
-      self._robot[0] += 1
+      new_rob_loc[0] += 1
     if a == 3:  # up
-      self._robot[0] -= 1
-    if (self._robot < 0).any() or (self._robot >= self._size).any():
-      print(f"action = {a}, robot = {self._robot}, fallout of boarder ...")
-      self._robot = orig_rob
-      return self._maze.reshape(1, -1), Maze.FAIL_REWARD, True
-
-    s = self._maze[self._robot[0], self._robot[1]]
-    self._maze[self._robot[0], self._robot[1]] = Maze.ROB_SYM
-    r = Maze.NEU_REWARD
-    if s == Maze.BLK_SYM:
-      print(f"action = {a}, robot = {self._robot}, fall into trap ...")
-      self._robot = orig_rob
-      r = Maze.FAIL_REWARD
-    elif s == Maze.ROAD_SYM:
-      r = Maze.NEU_REWARD
-    elif s == Maze.WIN_REWARD:
-      print(f"action = {a}, robot = {self._robot}, WIN!")
-      r = Maze.WIN_REWARD
+      new_rob_loc[0] -= 1
+    reward = self.place_rob(new_rob_loc)
+    state = self.get_state()
     self._step += 1
 
-    return self._maze.reshape(1, -1), r, s == Maze.FAIL_REWARD or s == Maze.WIN_REWARD
+    return state, reward, reward == Maze.FAIL_REWARD or reward == Maze.WIN_REWARD
 
   def print(self):
     maze = self._maze
@@ -117,16 +120,16 @@ if __name__ == "__main__":
   maze = Maze(3)
   maze.reset()
   maze.print()
-  time.sleep(2)
+  # time.sleep(2)
   maze.action(1)
   maze.print()
-  time.sleep(2)
+  # time.sleep(2)
   maze.action(2)
   maze.print()
-  time.sleep(2)
+  # time.sleep(2)
   maze.action(0)
   maze.print()
-  time.sleep(2)
+  # time.sleep(2)
   maze.action(3)
   maze.print()
 

@@ -119,6 +119,7 @@ class Agent:
 
   def train_offpolicy(self):
     for ep in range(args.episode):
+      self.env.reset()
       for _ in range(args.batch_size):
         state = self.env.rand_state()
         action = random.choice(range(self.action_dim))
@@ -127,10 +128,19 @@ class Agent:
       self.replay()
       self.target_update()
 
-      print(f'Episode {ep}, action rewards:')
       for rob, s in self.env.iter_states():
         act = self.model.get_action(s)
         print(f'      at {rob}, action = {act}')
+      done, total_reward = False, 0
+      state = self.env.reset()
+      while not done:
+        self.env.print()
+        action = self.model.get_action(state)
+        next_state, reward, done = self.env.action(action)
+        total_reward += reward
+        state = next_state
+      print(f'Episode {ep}, action rewards:{total_reward}')
+
 
   def train_onpolicy(self):
     for ep in range(args.episode):
