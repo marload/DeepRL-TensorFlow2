@@ -30,6 +30,8 @@ class Maze:
     self._maze[-1, -2] = Maze.ROAD_SYM
     self._maze[-1, -1] = Maze.DEST_SYM
     self._orig_maze = self._maze.copy()
+    self._fail_maze = self.FAIL_REWARD * np.ones(shape=(size, size), dtype=np.int)
+    self._win_maze = self.WIN_REWARD * np.ones(shape=(size, size), dtype=np.int)
     self._robot = np.zeros(shape=(2,), dtype=np.int)
     self.place_rob(self._robot)
 
@@ -60,8 +62,14 @@ class Maze:
     # need the batch dim when apply to one-step move
     return maze.reshape(1, -1)
 
-  def get_state(self):
-    return self._maze.copy().reshape(1, -1)
+  def get_state(self, reward=NEU_REWARD):
+    if reward == Maze.NEU_REWARD:
+      return self._maze.copy().reshape(1, -1)
+    if reward == Maze.FAIL_REWARD:
+      return self._fail_maze
+    if reward == Maze.WIN_REWARD:
+      return self._win_maze
+
 
   def rand_state(self):
     x = random.choice(range(self._size))
@@ -89,7 +97,7 @@ class Maze:
     if a == 3:  # up
       new_rob_loc[0] -= 1
     reward = self.place_rob(new_rob_loc)
-    state = self.get_state()
+    state = self.get_state(reward)
     self._step += 1
 
     return state, reward, reward == Maze.FAIL_REWARD or reward == Maze.WIN_REWARD
@@ -111,5 +119,5 @@ class Maze:
           or self._maze[self._robot[0], self._robot[1]] == Maze.DEST_SYM:
             continue
         self._maze[self._robot[0], self._robot[1]] = Maze.ROB_SYM
-        yield (x,y), self._maze.reshape(1, -1)
+        yield (x,y), self.get_state()
         self._maze[self._robot[0], self._robot[1]] = Maze.ROAD_SYM

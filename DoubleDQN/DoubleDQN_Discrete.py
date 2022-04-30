@@ -11,12 +11,12 @@ import random
 tf.keras.backend.set_floatx('float32')
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--gamma', type=float, default=0.5)
+parser.add_argument('--gamma', type=float, default=0.1)
 parser.add_argument('--lr', type=float, default=0.005)
 parser.add_argument('--batch_size', type=int, default=32)
 parser.add_argument('--episode', type=int, default=32)
 parser.add_argument('--replay_batch', type=int, default=10)
-parser.add_argument('--sample_method', type=str, default="recent")
+parser.add_argument('--sample_method', type=str, default="random")
 parser.add_argument('--train_policy', type=str, default="off-policy")
 parser.add_argument('--eps', type=float, default=0.9)
 parser.add_argument('--eps_decay', type=float, default=0.995)
@@ -65,7 +65,7 @@ class QualityModel:
       Input((self.state_dim,)),
       Dense(32, activation='relu'),
       Dense(16, activation='relu'),
-      Dense(self.action_dim)
+      Dense(self.action_dim, activation="softmax")
     ])
     model.compile(loss='mse', optimizer=Adam(args.lr))
     return model
@@ -107,8 +107,8 @@ class Agent:
     reward = np.ones((args.batch_size, self.action_dim)) * Maze.NEU_REWARD
     row, col = list(range(args.batch_size)), a
     reward[row, col] = value
-    # reward = np.exp(reward)
-    # reward = reward/np.sum(reward, axis=1, keepdims=True)
+    reward = np.exp(reward)
+    reward = reward/np.sum(reward, axis=1, keepdims=True)
     return reward
 
   def replay(self):
@@ -116,9 +116,9 @@ class Agent:
       if self.buffer.size() < args.batch_size:
         break
       states, actions, rewards, next_states, _ = self.buffer.sample()
-      rewards = self.vec_reward(actions, rewards)
+      rewards_vec = self.vec_reward(actions, rewards)
       next_q_values = self.target_model.predict(next_states)
-      targets = rewards + next_q_values * args.gamma
+      targets = rewards_vec * (1 - args.gamma) + next_q_values * args.gamma
       self.model.train(states, targets)
 
   def train(self):
@@ -128,14 +128,19 @@ class Agent:
       self.train_offpolicy()
 
   def train_offpolicy(self):
+    '''
+    tend to minimize total sum of the rewards, disregarding the weight of the samples
+    :return:
+    '''
+    self.env.reset()
+    for _, state in self.env.iter_states():
+      for action in range(self.action_dim):
+        next_state, reward, done = self.env.action(action)
+        self.buffer.put(state, action, reward, next_state, done)
     for ep in range(args.episode):
-      self.env.reset()
-      for _ in range(args.batch_size):
-        state = self.env.rand_state()
-        for action in range(self.action_dim):
-          next_state, reward, done = self.env.action(action)
-          self.buffer.put(state, action, reward, next_state, done)
-      self.replay()
+      for _ in range(10):
+        self.replay()
+      # update target_network every 10 batch
       self.target_update()
 
       for rob, s in self.env.iter_states():
