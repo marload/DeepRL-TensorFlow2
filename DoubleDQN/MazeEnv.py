@@ -57,6 +57,7 @@ class Maze:
     maze = self._orig_maze.copy()
     self._maze = maze
     self.place_rob(self._robot)
+    # need the batch dim when apply to one-step move
     return maze.reshape(1, -1)
 
   def get_state(self):
@@ -112,26 +113,3 @@ class Maze:
         self._maze[self._robot[0], self._robot[1]] = Maze.ROB_SYM
         yield (x,y), self._maze.reshape(1, -1)
         self._maze[self._robot[0], self._robot[1]] = Maze.ROAD_SYM
-
-
-if __name__ == "__main__":
-  import time
-
-  maze = Maze(3)
-  maze.reset()
-  maze.print()
-  # time.sleep(2)
-  maze.action(1)
-  maze.print()
-  # time.sleep(2)
-  maze.action(2)
-  maze.print()
-  # time.sleep(2)
-  maze.action(0)
-  maze.print()
-  # time.sleep(2)
-  maze.action(3)
-  maze.print()
-
-  for m in maze.iter_states():
-    print (m)

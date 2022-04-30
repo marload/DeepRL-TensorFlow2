@@ -47,3 +47,9 @@ class TestMaze(unittest.TestCase):
     self.assertEqual(reward, Maze.NEU_REWARD)
     self.assertFalse(done)
 
+
+  def test_action3(self):
+    action = 3
+    next_state, reward, done = self.env.action(action)
+    self.assertEqual(reward, Maze.FAIL_REWARD)
+    self.assertTrue(done)
