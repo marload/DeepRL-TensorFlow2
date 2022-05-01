@@ -66,9 +66,9 @@ class Maze:
     if reward == Maze.NEU_REWARD:
       return self._maze.copy().reshape(1, -1)
     if reward == Maze.FAIL_REWARD:
-      return self._fail_maze
+      return self._fail_maze.reshape(1, -1)
     if reward == Maze.WIN_REWARD:
-      return self._win_maze
+      return self._win_maze.reshape(1, -1)
 
 
   def rand_state(self):

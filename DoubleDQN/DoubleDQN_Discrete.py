@@ -11,8 +11,8 @@ import random
 tf.keras.backend.set_floatx('float32')
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--gamma', type=float, default=0.1)
-parser.add_argument('--lr', type=float, default=0.005)
+parser.add_argument('--gamma', type=float, default=0.4)
+parser.add_argument('--lr', type=float, default=0.001)
 parser.add_argument('--batch_size', type=int, default=32)
 parser.add_argument('--episode', type=int, default=32)
 parser.add_argument('--replay_batch', type=int, default=10)
@@ -63,9 +63,11 @@ class QualityModel:
   def create_model(self):
     model = tf.keras.Sequential([
       Input((self.state_dim,)),
+      Dense(128, activation='relu'),
       Dense(32, activation='relu'),
-      Dense(16, activation='relu'),
-      Dense(self.action_dim, activation="softmax")
+      Dense(self.action_dim)
+      # Note: if use softmax as activation, you have to provide all the values of possible actions
+      # as the target updating
     ])
     model.compile(loss='mse', optimizer=Adam(args.lr))
     return model
@@ -84,20 +86,20 @@ class QualityModel:
 
   def train(self, states, targets):
     self.updates += 1
-    self.model.fit(states, targets, epochs=1, verbose=0)
+    self.model.train_on_batch(states, targets)
 
 
 class Agent:
   def __init__(self, env:Maze):
     self.env = env
-    self.buffer = ReplayBuffer(args.batch_size*2)
+    self.buffer = ReplayBuffer(args.batch_size*3)
     self.state_dim = self.env.state_dim()
     self.action_dim = self.env.action_dim()
 
     self.model = QualityModel(self.state_dim, self.action_dim)
     self.target_model = QualityModel(self.state_dim, self.action_dim)
     self.target_update()
-
+    self.mse_error = deque(maxlen=50)
 
   def target_update(self):
     weights = self.model.model.get_weights()
@@ -116,10 +118,14 @@ class Agent:
       if self.buffer.size() < args.batch_size:
         break
       states, actions, rewards, next_states, _ = self.buffer.sample()
-      rewards_vec = self.vec_reward(actions, rewards)
+      # rewards_vec = self.vec_reward(actions, rewards)
+      row, col = list(range(args.batch_size)), actions
+      targets = self.model.predict(states)
       next_q_values = self.target_model.predict(next_states)
-      targets = rewards_vec * (1 - args.gamma) + next_q_values * args.gamma
+      targets[row, col] = rewards + next_q_values[row, col] * args.gamma
       self.model.train(states, targets)
+      q = self.model.predict(states)
+      self.mse_error.append(np.sqrt(np.mean((q - targets)**2)))
 
   def train(self):
     if args.train_policy == "on-policy":
@@ -132,11 +138,13 @@ class Agent:
     tend to minimize total sum of the rewards, disregarding the weight of the samples
     :return:
     '''
+    # Note: pay attention in collecting states
     self.env.reset()
-    for _, state in self.env.iter_states():
+    for loc, state in self.env.iter_states():
       for action in range(self.action_dim):
         next_state, reward, done = self.env.action(action)
         self.buffer.put(state, action, reward, next_state, done)
+        self.env.place_rob(np.array(loc))
     for ep in range(args.episode):
       for _ in range(10):
         self.replay()
@@ -157,7 +165,8 @@ class Agent:
         total_reward += reward
         state = next_state
         step += 1
-      print(f'Episode {ep}, action rewards:{total_reward}')
+      mse_error = np.mean([x for x in self.mse_error])
+      print(f'Episode {ep}, action rewards:{total_reward}, mse_error = {mse_error}')
 
 
   def train_onpolicy(self):

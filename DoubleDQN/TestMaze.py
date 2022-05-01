@@ -39,6 +39,7 @@ class TestMaze(unittest.TestCase):
     self.assertFalse(done)
     action = 1
     next_state, reward, done = self.env.action(action)
+    print("next state = \n", next_state.reshape(5,5))
     self.assertEqual(reward, Maze.FAIL_REWARD)
     self.assertTrue(done)
     action = 2
@@ -50,6 +51,37 @@ class TestMaze(unittest.TestCase):
 
   def test_action3(self):
     action = 3
+    print(f"states = {self.env.get_state()}")
     next_state, reward, done = self.env.action(action)
     self.assertEqual(reward, Maze.FAIL_REWARD)
     self.assertTrue(done)
+
+  def test_rob_action(self):
+    loc = np.array([0, 0])
+    self.env.place_rob(loc)
+    prev_state = self.env.get_state()
+    reward = []
+    done = []
+    for action in range(self.env.action_dim()):
+      _, r, d = self.env.action(action)
+      reward.append(r)
+      done.append(d)
+      self.env.place_rob(loc)
+    self.assertTrue((prev_state == self.env.get_state()).all())
+    self.assertEqual(reward, [Maze.FAIL_REWARD, Maze.NEU_REWARD, Maze.NEU_REWARD, Maze.FAIL_REWARD])
+    self.assertEqual(done, [True, False, False, True])
+
+    loc = np.array([1, 1])
+    self.env.place_rob(loc)
+    prev_state = self.env.get_state()
+    reward = []
+    done = []
+    for action in range(self.env.action_dim()):
+      _, r, d = self.env.action(action)
+      reward.append(r)
+      done.append(d)
+      self.env.place_rob(loc)
+    self.assertTrue((prev_state == self.env.get_state()).all())
+    self.assertEqual(reward, [Maze.NEU_REWARD, Maze.FAIL_REWARD, Maze.NEU_REWARD, Maze.NEU_REWARD])
+    self.assertEqual(done, [False, True, False, False])
+
