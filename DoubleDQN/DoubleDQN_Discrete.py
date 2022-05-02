@@ -2,7 +2,7 @@ from MazeEnv import Maze
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense, Flatten, Lambda
 from tensorflow.keras.optimizers import Adam
-
+from tensorflow.keras import optimizers
 import argparse
 import numpy as np
 from collections import deque
@@ -14,6 +14,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', type=float, default=0.4)
 parser.add_argument('--lr', type=float, default=0.001)
 parser.add_argument('--batch_size', type=int, default=32)
+parser.add_argument('--rand_seed', type=int, default=None)
 parser.add_argument('--episode', type=int, default=32)
 parser.add_argument('--replay_batch', type=int, default=10)
 parser.add_argument('--sample_method', type=str, default="random")
@@ -69,17 +70,19 @@ class QualityModel:
       # Note: if use softmax as activation, you have to provide all the values of possible actions
       # as the target updating
     ])
-    model.compile(loss='mse', optimizer=Adam(args.lr))
+    learning_rate = optimizers.schedules.ExponentialDecay(
+        initial_learning_rate = args.lr, decay_steps = 20, decay_rate = .5, staircase=True)
+    model.compile(loss='mse', optimizer=Adam(learning_rate))
     return model
 
   def predict(self, state):
     return self.model.predict(state)
 
   def get_action(self, state, deterministic=True):
-    self.epsilon *= args.eps_decay
-    self.epsilon = max(self.epsilon, args.eps_min)
     q_value = self.predict(state)[0]
     if not deterministic:
+      self.epsilon *= args.eps_decay
+      self.epsilon = max(self.epsilon, args.eps_min)
       if np.random.random() < self.epsilon:
         return random.randint(0, self.action_dim - 1)
     return np.argmax(q_value)
@@ -135,8 +138,8 @@ class Agent:
 
   def train_offpolicy(self):
     '''
-    tend to minimize total sum of the rewards, disregarding the weight of the samples
     :return:
+    Tends to fall into dead loop, eg (left -> right -> left -> right ....)
     '''
     # Note: pay attention in collecting states
     self.env.reset()
@@ -171,25 +174,68 @@ class Agent:
 
   def train_onpolicy(self):
     for ep in range(args.episode):
-      done, total_reward = False, 0
+      updates = 0
+      done = False
       state = self.env.reset()
-      while not done:
-        self.env.print()
-        action = self.model.get_action(state)
+      state_set = set([",".join(str(x) for x in state.reshape(-1))])
+      step = 0
+      while not done and step < 3*args.batch_size:
+        action = self.model.get_action(state, False)
+        action_set = set([action])
+        loc = self.env.get_rob()
         next_state, reward, done = self.env.action(action)
+        state_repr = ",".join(str(x) for x in next_state.reshape(-1))
+
+        while reward == Maze.FAIL_REWARD or state_repr in state_set:
+          self.env.place_rob(loc)
+          self.buffer.put(state, action, reward, next_state, done)
+          if len(action_set) >= self.action_dim:
+            done = True
+            print(f"dead loop, force break!")
+            break
+          for a in range(self.action_dim):
+            if a in action_set:
+              continue
+            action_set.add(a)
+            action = a
+            break
+          next_state, reward, done = self.env.action(action)
+          state_repr = ",".join(str(x) for x in next_state.reshape(-1))
         self.buffer.put(state, action, reward, next_state, done)
-        total_reward += reward
+        state_set.add(state_repr)
         state = next_state
+        step += 1
 
       if self.buffer.size() >= args.batch_size:
         self.replay()
-      self.target_update()
-      print('EP{} EpisodeReward={}, reward={}, updates = {}'.format(ep, total_reward, reward, self.model.updates))
+        self.target_update()
+        updates += 1
+
+      if updates > 0:
+        state = self.env.reset()
+        print(f"iter whole locations ...")
+        for rob, s in self.env.iter_states():
+          act = self.model.get_action(s)
+          print(f'      at {rob}, action = {act}')
+        state = self.env.reset()
+        step = 0
+        reward = Maze.NEU_REWARD
+        while reward != Maze.FAIL_REWARD and reward != Maze.WIN_REWARD and step < 10:
+          self.env.print()
+          action = self.model.get_action(state)
+          print(f"action: {action}")
+          next_state, reward, done = self.env.action(action)
+          state = next_state
+          step += 1
+        mse_error = np.mean([x for x in self.mse_error])
+        print(f'Episode {ep}, mse_error = {mse_error}, updates = {updates}')
+      else:
+        print(f'Episode {ep}, updates = {updates}')
 
 
 def main():
   print(f"args = {args}")
-  env = Maze(5)
+  env = Maze(5, args.rand_seed)
   agent = Agent(env)
   agent.train()
 

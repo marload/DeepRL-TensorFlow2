@@ -14,10 +14,12 @@ class Maze:
   POS_REWARD = 1
   WIN_REWARD = 2
 
-  def __init__(self, size):
+  def __init__(self, size, rs = None):
     self._step = 0
     self._size = size
     self._maze = np.zeros(shape=(size, size), dtype=np.int) + Maze.ROAD_SYM
+    if rs is not None:
+      random.seed(rs)
     # random select 2 blockers
     block_num = 2
     bk_x = random.sample(range(size), block_num)
@@ -60,7 +62,7 @@ class Maze:
     self._maze = maze
     self.place_rob(self._robot)
     # need the batch dim when apply to one-step move
-    return maze.reshape(1, -1)
+    return self.get_state()
 
   def get_state(self, reward=NEU_REWARD):
     if reward == Maze.NEU_REWARD:
@@ -70,6 +72,8 @@ class Maze:
     if reward == Maze.WIN_REWARD:
       return self._win_maze.reshape(1, -1)
 
+  def get_rob(self):
+    return self._robot.copy()
 
   def rand_state(self):
     x = random.choice(range(self._size))
@@ -100,7 +104,7 @@ class Maze:
     state = self.get_state(reward)
     self._step += 1
 
-    return state, reward, reward == Maze.FAIL_REWARD or reward == Maze.WIN_REWARD
+    return state, reward, reward == Maze.WIN_REWARD
 
   def print(self):
     maze = self._maze

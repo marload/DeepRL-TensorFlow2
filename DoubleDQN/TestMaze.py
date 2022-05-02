@@ -41,7 +41,7 @@ class TestMaze(unittest.TestCase):
     next_state, reward, done = self.env.action(action)
     print("next state = \n", next_state.reshape(5,5))
     self.assertEqual(reward, Maze.FAIL_REWARD)
-    self.assertTrue(done)
+    self.assertFalse(done)
     action = 2
     next_state, reward, done = self.env.action(action)
     print("next state = \n", next_state.reshape(5,5))
@@ -54,7 +54,7 @@ class TestMaze(unittest.TestCase):
     print(f"states = {self.env.get_state()}")
     next_state, reward, done = self.env.action(action)
     self.assertEqual(reward, Maze.FAIL_REWARD)
-    self.assertTrue(done)
+    self.assertFalse(done)
 
   def test_rob_action(self):
     loc = np.array([0, 0])
@@ -69,7 +69,7 @@ class TestMaze(unittest.TestCase):
       self.env.place_rob(loc)
     self.assertTrue((prev_state == self.env.get_state()).all())
     self.assertEqual(reward, [Maze.FAIL_REWARD, Maze.NEU_REWARD, Maze.NEU_REWARD, Maze.FAIL_REWARD])
-    self.assertEqual(done, [True, False, False, True])
+    self.assertEqual(done, [False, False, False, False])
 
     loc = np.array([1, 1])
     self.env.place_rob(loc)
@@ -83,5 +83,5 @@ class TestMaze(unittest.TestCase):
       self.env.place_rob(loc)
     self.assertTrue((prev_state == self.env.get_state()).all())
     self.assertEqual(reward, [Maze.NEU_REWARD, Maze.FAIL_REWARD, Maze.NEU_REWARD, Maze.NEU_REWARD])
-    self.assertEqual(done, [False, True, False, False])
+    self.assertEqual(done, [False, False, False, False])
 
