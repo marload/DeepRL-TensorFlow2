@@ -45,7 +45,6 @@ class ReplayBuffer:
     states, actions, rewards, next_states, done = map(np.asarray, zip(*sample))
     states = states.reshape(bs, -1)
     next_states = next_states.reshape(bs, -1)
-    done = done.reshape(bs, 1)
     return states, actions, rewards, next_states, done
 
 
