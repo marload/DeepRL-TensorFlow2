@@ -120,12 +120,13 @@ class Agent:
     for _ in range(args.replay_batch):
       if self.buffer.size() < args.batch_size:
         break
-      states, actions, rewards, next_states, done = self.buffer.sample()
+      # Note: for end states, should use different update schema
+      states, actions, rewards, next_states, end = self.buffer.sample()
       # rewards_vec = self.vec_reward(actions, rewards)
       row, col = list(range(args.batch_size)), actions
       targets = self.model.predict(states)
       next_q_values = self.target_model.predict(next_states)
-      targets[row, col] = rewards + (1.0 - done)*next_q_values[row, col] * args.gamma
+      targets[row, col] = rewards + (1.0 - end)*next_q_values[row, col] * args.gamma
       self.model.train(states, targets)
       q = self.model.predict(states)
       self.mse_error.append(np.sqrt(np.mean((q - targets)**2)))
