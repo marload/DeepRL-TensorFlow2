@@ -120,12 +120,12 @@ class Agent:
     for _ in range(args.replay_batch):
       if self.buffer.size() < args.batch_size:
         break
-      states, actions, rewards, next_states, _ = self.buffer.sample()
+      states, actions, rewards, next_states, done = self.buffer.sample()
       # rewards_vec = self.vec_reward(actions, rewards)
       row, col = list(range(args.batch_size)), actions
       targets = self.model.predict(states)
       next_q_values = self.target_model.predict(next_states)
-      targets[row, col] = rewards + next_q_values[row, col] * args.gamma
+      targets[row, col] = rewards + (1.0 - done)*next_q_values[row, col] * args.gamma
       self.model.train(states, targets)
       q = self.model.predict(states)
       self.mse_error.append(np.sqrt(np.mean((q - targets)**2)))
@@ -146,7 +146,7 @@ class Agent:
     for loc, state in self.env.iter_states():
       for action in range(self.action_dim):
         next_state, reward, done = self.env.action(action)
-        self.buffer.put(state, action, reward, next_state, done)
+        self.buffer.put(state, action, reward, next_state, done or reward == Maze.FAIL_REWARD)
         self.env.place_rob(np.array(loc))
     for ep in range(args.episode):
       for _ in range(10):
@@ -188,7 +188,7 @@ class Agent:
 
         while reward == Maze.FAIL_REWARD or state_repr in state_set:
           self.env.place_rob(loc)
-          self.buffer.put(state, action, reward, next_state, done)
+          self.buffer.put(state, action, reward, next_state, done or reward == Maze.FAIL_REWARD)
           if len(action_set) >= self.action_dim:
             done = True
             print(f"dead loop, force break!")
@@ -201,7 +201,7 @@ class Agent:
             break
           next_state, reward, done = self.env.action(action)
           state_repr = ",".join(str(x) for x in next_state.reshape(-1))
-        self.buffer.put(state, action, reward, next_state, done)
+        self.buffer.put(state, action, reward, next_state, done or reward == Maze.FAIL_REWARD)
         state_set.add(state_repr)
         state = next_state
         step += 1
