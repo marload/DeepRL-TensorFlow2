@@ -125,6 +125,7 @@ class Agent:
       row, col = list(range(args.batch_size)), actions
       targets = self.model.predict(states)
       next_q_values = self.target_model.predict(next_states)
+      # Note: only updates actions that exist in the replay plot
       targets[row, col] = rewards + (1.0 - end)*next_q_values[row, col] * args.gamma
       self.model.train(states, targets)
       q = self.model.predict(states)

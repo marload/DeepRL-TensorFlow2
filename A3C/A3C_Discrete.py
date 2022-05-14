@@ -28,12 +28,15 @@ class Actor:
         self.model = self.create_model()
         self.opt = tf.keras.optimizers.Adam(args.actor_lr)
         self.entropy_beta = 0.01
+        self.core_model = None
 
     def create_model(self):
+        self.core_model = tf.keras.Sequential([
+            Dense(32, activation='relu'),
+            Dense(16, activation='relu')])
         return tf.keras.Sequential([
             Input((self.state_dim,)),
-            Dense(32, activation='relu'),
-            Dense(16, activation='relu'),
+            self.core_model,
             Dense(self.action_dim, activation='softmax')
         ])
 
@@ -46,7 +49,10 @@ class Actor:
         policy_loss = ce_loss(
             actions, logits, sample_weight=tf.stop_gradient(advantages))
         entropy = entropy_loss(logits, logits)
-        return policy_loss - self.entropy_beta * entropy
+        # Q: is it correct to use this loss to get gradient ? yes!
+        # Q: sum or sub of the two ?
+        return policy_loss + self.entropy_beta * entropy
+        # return policy_loss - self.entropy_beta * entropy
 
     def train(self, states, actions, advantages):
         with tf.GradientTape() as tape:
@@ -59,16 +65,14 @@ class Actor:
 
 
 class Critic:
-    def __init__(self, state_dim):
+    def __init__(self, state_dim, actor_core):
         self.state_dim = state_dim
-        self.model = self.create_model()
+        self.model = self.create_model(actor_core)
         self.opt = tf.keras.optimizers.Adam(args.critic_lr)
 
-    def create_model(self):
+    def create_model(self, actor_core):
         return tf.keras.Sequential([
-            Input((self.state_dim,)),
-            Dense(32, activation='relu'),
-            Dense(16, activation='relu'),
+            actor_core,
             Dense(16, activation='relu'),
             Dense(1, activation='linear')
         ])
@@ -95,7 +99,7 @@ class Agent:
         self.action_dim = env.action_space.n
 
         self.global_actor = Actor(self.state_dim, self.action_dim)
-        self.global_critic = Critic(self.state_dim)
+        self.global_critic = Critic(self.state_dim, self.global_actor.core_model)
         self.num_workers = cpu_count()
 
     def train(self, max_episodes=1000):
@@ -125,7 +129,7 @@ class WorkerAgent(Thread):
         self.global_actor = global_actor
         self.global_critic = global_critic
         self.actor = Actor(self.state_dim, self.action_dim)
-        self.critic = Critic(self.state_dim)
+        self.critic = Critic(self.state_dim, self.actor.core_model)
 
         self.actor.model.set_weights(self.global_actor.model.get_weights())
         self.critic.model.set_weights(self.global_critic.model.get_weights())
@@ -137,8 +141,7 @@ class WorkerAgent(Thread):
             cumulative = next_v_value
 
         for k in reversed(range(0, len(rewards))):
-            cumulative = args.gamma * cumulative + rewards[k]
-            td_targets[k] = cumulative
+            td_targets[k] = cumulative = args.gamma * cumulative + rewards[k]
         return td_targets
 
     def advatnage(self, td_targets, baselines):
@@ -202,8 +205,6 @@ class WorkerAgent(Thread):
                     state_batch = []
                     action_batch = []
                     reward_batch = []
-                    td_target_batch = []
-                    advatnage_batch = []
 
                 episode_reward += reward[0][0]
                 state = next_state[0]
