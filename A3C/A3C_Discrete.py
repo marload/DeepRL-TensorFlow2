@@ -1,20 +1,20 @@
-import wandb
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense
 
-import gym
+from Env import Maze
 import argparse
 import numpy as np
 from threading import Thread, Lock
 from multiprocessing import cpu_count
 tf.keras.backend.set_floatx('float64')
-wandb.init(name='A3C', project="deep-rl-tf2")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', type=float, default=0.99)
 parser.add_argument('--update_interval', type=int, default=5)
 parser.add_argument('--actor_lr', type=float, default=0.0005)
 parser.add_argument('--critic_lr', type=float, default=0.001)
+parser.add_argument('--rand_seed', type=int, default=None)
+parser.add_argument('--episode', type=int, default=32)
 
 args = parser.parse_args()
 
@@ -93,20 +93,21 @@ class Critic:
 
 class Agent:
     def __init__(self, env_name):
-        env = gym.make(env_name)
+        env = Maze(5, rs=args.rand_seed)
         self.env_name = env_name
-        self.state_dim = env.observation_space.shape[0]
-        self.action_dim = env.action_space.n
+        self.state_dim = env.state_dim()
+        self.action_dim = env.action_dim()
 
         self.global_actor = Actor(self.state_dim, self.action_dim)
         self.global_critic = Critic(self.state_dim, self.global_actor.core_model)
         self.num_workers = cpu_count()
 
-    def train(self, max_episodes=1000):
+    def train(self):
+        max_episodes = args.episode
         workers = []
 
         for i in range(self.num_workers):
-            env = gym.make(self.env_name)
+            env = Maze(5, rs=args.rand_seed)
             workers.append(WorkerAgent(
                 env, self.global_actor, self.global_critic, max_episodes))
 
@@ -122,8 +123,8 @@ class WorkerAgent(Thread):
         Thread.__init__(self)
         self.lock = Lock()
         self.env = env
-        self.state_dim = self.env.observation_space.shape[0]
-        self.action_dim = self.env.action_space.n
+        self.state_dim = self.env.state_dim()
+        self.action_dim = self.env.action_dim()
 
         self.max_episodes = max_episodes
         self.global_actor = global_actor
@@ -170,7 +171,7 @@ class WorkerAgent(Thread):
                     np.reshape(state, [1, self.state_dim]))
                 action = np.random.choice(self.action_dim, p=probs[0])
 
-                next_state, reward, done, _ = self.env.step(action)
+                next_state, reward, done = self.env.action(action)
 
                 state = np.reshape(state, [1, self.state_dim])
                 action = np.reshape(action, [1, 1])
@@ -192,15 +193,31 @@ class WorkerAgent(Thread):
                     advantages = td_targets - self.critic.model.predict(states)
                     
                     with self.lock:
-                        actor_loss = self.global_actor.train(
+                        self.global_actor.train(
                             states, actions, advantages)
-                        critic_loss = self.global_critic.train(
+                        self.global_critic.train(
                             states, td_targets)
 
                         self.actor.model.set_weights(
                             self.global_actor.model.get_weights())
                         self.critic.model.set_weights(
                             self.global_critic.model.get_weights())
+                        # show temp results:
+                        for rob, s in self.env.iter_states():
+                            probs = self.actor.model.predict(s)
+                            print(f'      at {rob}, action probs = {probs}')
+                        done, total_reward = False, 0
+                        state = self.env.reset()
+                        step = 0
+                        while not done and step < 10:
+                            self.env.print()
+                            action = np.argmax(self.actor.model.predict(state))
+                            print(f"action: {action}")
+                            next_state, reward, done = self.env.action(action)
+                            total_reward += reward
+                            state = next_state
+                            step += 1
+                        print(f'Episode {CUR_EPISODE}, rewards:{total_reward}')
 
                     state_batch = []
                     action_batch = []
@@ -210,7 +227,6 @@ class WorkerAgent(Thread):
                 state = next_state[0]
 
             print('EP{} EpisodeReward={}'.format(CUR_EPISODE, episode_reward))
-            wandb.log({'Reward': episode_reward})
             CUR_EPISODE += 1
 
     def run(self):
@@ -218,7 +234,7 @@ class WorkerAgent(Thread):
 
 
 def main():
-    env_name = 'CartPole-v1'
+    env_name = 'Maze'
     agent = Agent(env_name)
     agent.train()
 

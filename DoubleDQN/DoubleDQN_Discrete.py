@@ -67,7 +67,9 @@ class QualityModel:
       Dense(32, activation='relu'),
       Dense(self.action_dim)
       # Note: if use softmax as activation, you have to provide all the values of possible actions
-      # as the target updating
+      # as the target updating,
+      # also, because it is Q-function, it makes no sense to use the softmax activation.
+      # Only if it was a policy function, it did
     ])
     learning_rate = optimizers.schedules.ExponentialDecay(
         initial_learning_rate = args.lr, decay_steps = 20, decay_rate = .5, staircase=True)
