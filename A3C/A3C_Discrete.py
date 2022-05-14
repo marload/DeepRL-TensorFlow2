@@ -1,4 +1,5 @@
 import tensorflow as tf
+from tensorflow import keras
 from tensorflow.keras.layers import Input, Dense
 
 from Env import Maze
@@ -6,7 +7,7 @@ import argparse
 import numpy as np
 from threading import Thread, Lock
 from multiprocessing import cpu_count
-tf.keras.backend.set_floatx('float64')
+keras.backend.set_floatx('float64')
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', type=float, default=0.99)
@@ -17,33 +18,34 @@ parser.add_argument('--rand_seed', type=int, default=None)
 parser.add_argument('--episode', type=int, default=32)
 
 args = parser.parse_args()
+print(f"args = {args}")
 
 CUR_EPISODE = 0
 
 
-class Actor:
+class ActorCritic:
     def __init__(self, state_dim, action_dim):
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.model = self.create_model()
-        self.opt = tf.keras.optimizers.Adam(args.actor_lr)
+        self.act_opt = keras.optimizers.Adam(args.actor_lr)
+        self.cri_opt = keras.optimizers.Adam(args.critic_lr)
         self.entropy_beta = 0.01
-        self.core_model = None
+        self.act_model, self.cri_model = self.create_model()
 
     def create_model(self):
-        self.core_model = tf.keras.Sequential([
-            Dense(32, activation='relu'),
-            Dense(16, activation='relu')])
-        return tf.keras.Sequential([
-            Input((self.state_dim,)),
-            self.core_model,
-            Dense(self.action_dim, activation='softmax')
-        ])
+        inp = Input((self.state_dim,))
+        share_model = Dense(16, activation='relu')(
+                Dense(32, activation='relu')(inp))
+        act_out = Dense(self.action_dim, activation='softmax')(share_model)
+        outp = Dense(16, activation='relu')(share_model)
+        cri_out = Dense(1, activation="linear")(outp)
+        return keras.Model(inp, act_out), keras.Model(inp, cri_out)
 
-    def compute_loss(self, actions, logits, advantages):
-        ce_loss = tf.keras.losses.SparseCategoricalCrossentropy(
+    def compute_act_loss(self, actions, logits, advantages):
+        ce_loss = keras.losses.SparseCategoricalCrossentropy(
             from_logits=True)
-        entropy_loss = tf.keras.losses.CategoricalCrossentropy(
+        entropy_loss = keras.losses.CategoricalCrossentropy(
             from_logits=True)
         actions = tf.cast(actions, tf.int32)
         policy_loss = ce_loss(
@@ -54,40 +56,26 @@ class Actor:
         return policy_loss + self.entropy_beta * entropy
         # return policy_loss - self.entropy_beta * entropy
 
-    def train(self, states, actions, advantages):
+    def train_actor(self, states, actions, advantages):
         with tf.GradientTape() as tape:
-            logits = self.model(states, training=True)
-            loss = self.compute_loss(
+            logits = self.act_model(states, training=True)
+            loss = self.compute_act_loss(
                 actions, logits, advantages)
-        grads = tape.gradient(loss, self.model.trainable_variables)
-        self.opt.apply_gradients(zip(grads, self.model.trainable_variables))
+        grads = tape.gradient(loss, self.act_model.trainable_variables)
+        self.act_opt.apply_gradients(zip(grads, self.act_model.trainable_variables))
         return loss
 
-
-class Critic:
-    def __init__(self, state_dim, actor_core):
-        self.state_dim = state_dim
-        self.model = self.create_model(actor_core)
-        self.opt = tf.keras.optimizers.Adam(args.critic_lr)
-
-    def create_model(self, actor_core):
-        return tf.keras.Sequential([
-            actor_core,
-            Dense(16, activation='relu'),
-            Dense(1, activation='linear')
-        ])
-
-    def compute_loss(self, v_pred, td_targets):
-        mse = tf.keras.losses.MeanSquaredError()
+    def compute_cri_loss(self, v_pred, td_targets):
+        mse = keras.losses.MeanSquaredError()
         return mse(td_targets, v_pred)
 
-    def train(self, states, td_targets):
+    def train_critic(self, states, td_targets):
         with tf.GradientTape() as tape:
-            v_pred = self.model(states, training=True)
+            v_pred = self.cri_model(states, training=True)
             assert v_pred.shape == td_targets.shape
-            loss = self.compute_loss(v_pred, tf.stop_gradient(td_targets))
-        grads = tape.gradient(loss, self.model.trainable_variables)
-        self.opt.apply_gradients(zip(grads, self.model.trainable_variables))
+            loss = self.compute_cri_loss(v_pred, tf.stop_gradient(td_targets))
+        grads = tape.gradient(loss, self.cri_model.trainable_variables)
+        self.cri_opt.apply_gradients(zip(grads, self.cri_model.trainable_variables))
         return loss
 
 
@@ -98,8 +86,7 @@ class Agent:
         self.state_dim = env.state_dim()
         self.action_dim = env.action_dim()
 
-        self.global_actor = Actor(self.state_dim, self.action_dim)
-        self.global_critic = Critic(self.state_dim, self.global_actor.core_model)
+        self.global_a3c = ActorCritic(self.state_dim, self.action_dim)
         self.num_workers = cpu_count()
 
     def train(self):
@@ -108,8 +95,7 @@ class Agent:
 
         for i in range(self.num_workers):
             env = Maze(5, rs=args.rand_seed)
-            workers.append(WorkerAgent(
-                env, self.global_actor, self.global_critic, max_episodes))
+            workers.append(WorkerAgent(env, self.global_a3c, max_episodes))
 
         for worker in workers:
             worker.start()
@@ -119,7 +105,7 @@ class Agent:
 
 
 class WorkerAgent(Thread):
-    def __init__(self, env, global_actor, global_critic, max_episodes):
+    def __init__(self, env, global_a3c, max_episodes):
         Thread.__init__(self)
         self.lock = Lock()
         self.env = env
@@ -127,13 +113,13 @@ class WorkerAgent(Thread):
         self.action_dim = self.env.action_dim()
 
         self.max_episodes = max_episodes
-        self.global_actor = global_actor
-        self.global_critic = global_critic
-        self.actor = Actor(self.state_dim, self.action_dim)
-        self.critic = Critic(self.state_dim, self.actor.core_model)
+        self.global_a3c = global_a3c
+        a3c_local = ActorCritic(self.state_dim, self.action_dim)
+        self.actor = a3c_local.act_model
+        self.critic = a3c_local.cri_model
 
-        self.actor.model.set_weights(self.global_actor.model.get_weights())
-        self.critic.model.set_weights(self.global_critic.model.get_weights())
+        self.actor.set_weights(self.global_a3c.act_model.get_weights())
+        self.critic.set_weights(self.global_a3c.cri_model.get_weights())
 
     def n_step_td_target(self, rewards, next_v_value, done):
         td_targets = np.zeros_like(rewards)
@@ -167,8 +153,9 @@ class WorkerAgent(Thread):
 
             while not done:
                 # self.env.render()
-                probs = self.actor.model.predict(
+                probs = self.actor.predict(
                     np.reshape(state, [1, self.state_dim]))
+                # Note: not select the max!
                 action = np.random.choice(self.action_dim, p=probs[0])
 
                 next_state, reward, done = self.env.action(action)
@@ -193,25 +180,25 @@ class WorkerAgent(Thread):
                     advantages = td_targets - self.critic.model.predict(states)
                     
                     with self.lock:
-                        self.global_actor.train(
+                        self.global_a3c.train_actor(
                             states, actions, advantages)
-                        self.global_critic.train(
+                        self.global_a3c.train_critic(
                             states, td_targets)
 
-                        self.actor.model.set_weights(
-                            self.global_actor.model.get_weights())
+                        self.actor.set_weights(
+                            self.global_a3c.act_model.get_weights())
                         self.critic.model.set_weights(
-                            self.global_critic.model.get_weights())
+                            self.global_a3c.cri_model.get_weights())
                         # show temp results:
                         for rob, s in self.env.iter_states():
-                            probs = self.actor.model.predict(s)
+                            probs = self.actor.predict(s)
                             print(f'      at {rob}, action probs = {probs}')
                         done, total_reward = False, 0
                         state = self.env.reset()
                         step = 0
                         while not done and step < 10:
                             self.env.print()
-                            action = np.argmax(self.actor.model.predict(state))
+                            action = np.argmax(self.actor.predict(state))
                             print(f"action: {action}")
                             next_state, reward, done = self.env.action(action)
                             total_reward += reward
