@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.layers import Input, Dense
-
+import io
 from Env import Maze
 import argparse
 import numpy as np
@@ -43,18 +43,16 @@ class ActorCritic:
         return keras.Model(inp, act_out), keras.Model(inp, cri_out)
 
     def compute_act_loss(self, actions, logits, advantages):
-        ce_loss = keras.losses.SparseCategoricalCrossentropy(
-            from_logits=True)
-        entropy_loss = keras.losses.CategoricalCrossentropy(
-            from_logits=True)
+        ce_loss = keras.losses.SparseCategoricalCrossentropy()
+        entropy_loss = keras.losses.CategoricalCrossentropy()
         actions = tf.cast(actions, tf.int32)
         policy_loss = ce_loss(
             actions, logits, sample_weight=tf.stop_gradient(advantages))
-        entropy = entropy_loss(logits, logits)
+        # Note: should use ones like logits instead of logits itself to compute entropy
+        entropy = entropy_loss(tf.ones_like(logits), logits)
         # Q: is it correct to use this loss to get gradient ? yes!
-        # Q: sum or sub of the two ?
-        return policy_loss + self.entropy_beta * entropy
-        # return policy_loss - self.entropy_beta * entropy
+        # Q: sum or sub of the two ? sub, entropy is exactly the negative log(p)
+        return policy_loss - self.entropy_beta * entropy
 
     def train_actor(self, states, actions, advantages):
         with tf.GradientTape() as tape:
@@ -67,6 +65,7 @@ class ActorCritic:
 
     def compute_cri_loss(self, v_pred, td_targets):
         mse = keras.losses.MeanSquaredError()
+        # Note:
         return mse(td_targets, v_pred)
 
     def train_critic(self, states, td_targets):
@@ -87,7 +86,7 @@ class Agent:
         self.action_dim = env.action_dim()
 
         self.global_a3c = ActorCritic(self.state_dim, self.action_dim)
-        self.num_workers = cpu_count()
+        self.num_workers = 1
 
     def train(self):
         max_episodes = args.episode
@@ -122,7 +121,7 @@ class WorkerAgent(Thread):
         self.critic.set_weights(self.global_a3c.cri_model.get_weights())
 
     def n_step_td_target(self, rewards, next_v_value, done):
-        td_targets = np.zeros_like(rewards)
+        td_targets = np.zeros_like(rewards).astype(np.float)
         cumulative = 0
         if not done:
             cumulative = next_v_value
@@ -152,8 +151,7 @@ class WorkerAgent(Thread):
             state = self.env.reset()
 
             while not done:
-                # self.env.render()
-                probs = self.actor.predict(
+                probs = self.actor(
                     np.reshape(state, [1, self.state_dim]))
                 # Note: not select the max!
                 action = np.random.choice(self.action_dim, p=probs[0])
@@ -168,17 +166,20 @@ class WorkerAgent(Thread):
                 state_batch.append(state)
                 action_batch.append(action)
                 reward_batch.append(reward)
+                episode_reward += reward[0][0]
+                # Note: pay attention for different env, the method to get next state is also different
+                state = self.env.get_state()
 
                 if len(state_batch) >= args.update_interval or done:
                     states = self.list_to_batch(state_batch)
                     actions = self.list_to_batch(action_batch)
                     rewards = self.list_to_batch(reward_batch)
 
-                    next_v_value = self.critic.model.predict(next_state)
+                    next_v_value = self.critic(next_state)
                     td_targets = self.n_step_td_target(
                         rewards, next_v_value, done)
-                    advantages = td_targets - self.critic.model.predict(states)
-                    
+                    advantages = td_targets - self.critic(states)
+
                     with self.lock:
                         self.global_a3c.train_actor(
                             states, actions, advantages)
@@ -187,34 +188,41 @@ class WorkerAgent(Thread):
 
                         self.actor.set_weights(
                             self.global_a3c.act_model.get_weights())
-                        self.critic.model.set_weights(
+                        self.critic.set_weights(
                             self.global_a3c.cri_model.get_weights())
-                        # show temp results:
-                        for rob, s in self.env.iter_states():
-                            probs = self.actor.predict(s)
-                            print(f'      at {rob}, action probs = {probs}')
-                        done, total_reward = False, 0
-                        state = self.env.reset()
-                        step = 0
-                        while not done and step < 10:
-                            self.env.print()
-                            action = np.argmax(self.actor.predict(state))
-                            print(f"action: {action}")
-                            next_state, reward, done = self.env.action(action)
-                            total_reward += reward
-                            state = next_state
-                            step += 1
-                        print(f'Episode {CUR_EPISODE}, rewards:{total_reward}')
+                        self.show_result()
 
                     state_batch = []
                     action_batch = []
                     reward_batch = []
 
-                episode_reward += reward[0][0]
-                state = next_state[0]
 
             print('EP{} EpisodeReward={}'.format(CUR_EPISODE, episode_reward))
             CUR_EPISODE += 1
+
+    def show_result(self):
+        global CUR_EPISODE
+        output = io.StringIO()
+        # show temp results:
+        loc = self.env.get_rob()
+        for rob, s in self.env.iter_states():
+            probs = self.actor(s)
+            output.write(f'      at {rob}, action = {np.argmax(probs)}, probs = {probs}\n')
+        done, total_reward = False, 0
+        state = self.env.reset()
+        step = 0
+        while not done and step < 10:
+            self.env.print(output)
+            action = np.argmax(self.actor(state))
+            output.write(f"action: {action}\n")
+            next_state, reward, done = self.env.action(action)
+            done = done or (reward == Maze.FAIL_REWARD)
+            total_reward += reward
+            state = next_state
+            step += 1
+        print(f'{output.getvalue()}\nEpisode {CUR_EPISODE}, rewards:{total_reward}', flush=True)
+        output.close()
+        self.env.place_rob(loc)
 
     def run(self):
         self.train()

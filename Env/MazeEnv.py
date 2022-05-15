@@ -106,13 +106,13 @@ class Maze:
 
     return state, reward, reward == Maze.WIN_REWARD
 
-  def print(self):
+  def print(self, file=sys.stdout):
     maze = self._maze
     for i in range(self._size):
       line = " | ".join(f"{x:2d}" if x != Maze.ROB_SYM else f" *" for x in maze[i, :])
-      print(f"{line}\n")
-      print("_" * len(line) + "\n")
-    print("*" * len(line) + "\n")
+      print(f"{line}\n", file=file)
+      print("_" * len(line) + "\n", file=file)
+    print("*" * len(line) + "\n", file=file)
 
   def iter_states(self):
     self._maze[self._robot[0], self._robot[1]] = Maze.ROAD_SYM
