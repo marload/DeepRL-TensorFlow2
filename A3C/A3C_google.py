@@ -61,8 +61,10 @@ class Environment:
 
   def action(self, a):
     loc = self.env.get_rob()
+    a = int(a)
     state, rwd, done = self.env.action(a)
     self.trace.add((loc[0], loc[1], a))
+    print(f"at loc: {loc}, action: {a}")
     return state, rwd, done
 
   def select_action(self, action_logits_t: tf.Tensor) -> (tf.Tensor, tf.Tensor):
@@ -81,6 +83,8 @@ class Environment:
       self.env.place_rob(rob)
     action_logits_t = tf.expand_dims(action_val.stack(), 0)
     action_ind = action_ind.stack()
+    if action_ind.shape == 0:
+      return tf.constant(-1), tf.constant(-1)
     action = action_ind[tf.random.categorical(action_logits_t, 1)[0, 0]]
     return action_probs[0, action], action
 
@@ -162,6 +166,9 @@ class Environment:
 
       # Store log probability of the action chosen
       action_prob, action = self.select_action(action_logits_t)
+      if action == -1:
+        print("reach dead loop!")
+        break
       action_probs = action_probs.write(t, action_prob)
 
       # Apply action to the environment to get next state and reward
